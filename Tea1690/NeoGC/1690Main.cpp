@@ -1066,16 +1066,6 @@ void DWkeyCallback(GLFWwindow* window, int key, int scancode, int action, int mo
     }
     if (action == GLFW_PRESS)
     {
-        if (key == GLFW_KEY_U)
-        {
-                IO[0x07] = 0xFFFF;
-                IO[0x08] = 0;
-                IO[0x09] = 1280 | (1 << 13) | (1 << 15);
-                IO[0x0A] = 0xFFFF;
-                IO[0x0B] = 32768;
-                IO[0x0C] = 0xFFFF;
-                IO[0x0D] = 32768;
-        }
         if (key == GLFW_KEY_0)
         {
             current_address = 0;
@@ -1439,11 +1429,11 @@ int main(int argc, char** argv)
     // Initialize GLFW
     glfwInit();
 
-    // Create a windowed   
+    // Create a windowed Â  
     //mode window and its OpenGL context
         window = glfwCreateWindow(512, 480, "1690 emulator", NULL, NULL);
 
-    // Make the window's context   
+    // Make the window's context Â  
     //current
         glfwMakeContextCurrent(window);
 
@@ -1789,7 +1779,7 @@ int main(int argc, char** argv)
 
         glfwMakeContextCurrent(window);
 
-        // Render here  
+        // Render here Â 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, secondaryFrameBuffer);
         // Set palette
         int width, height;
@@ -1913,7 +1903,7 @@ int main(int argc, char** argv)
                 vram_display_address = vram_display_address_copy;
                 //testValue++;
 
-                // Render here  
+                // Render here Â 
                 if (DISPMode == 2)
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, VWFrameBuffer);
                 else
