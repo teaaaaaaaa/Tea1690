@@ -1,1 +1,2 @@
+- this is only verified to run on windows. Any other platforms may have issues or be incompatible.
 - The source code was built using visual studio 2022. To access it, open the .sln files.
