@@ -1,0 +1,34 @@
+﻿  NeoGC.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file 'NeoGC.cpp')
+      C:\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h(123,11):
+      see previous definition of 'APIENTRY'
+  
+C:\Users\goodn\source\repos\NeoGC\NeoGC\NeoGC.cpp(171,32): warning C4244: '=': conversion from 'std::streamsize' to 'unsigned int', possible loss of data
+C:\Users\goodn\source\repos\NeoGC\NeoGC\NeoGC.cpp(289,25): warning C4244: 'initializing': conversion from 'double' to 'short', possible loss of data
+C:\Users\goodn\source\repos\NeoGC\NeoGC\NeoGC.cpp(290,25): warning C4244: 'initializing': conversion from 'double' to 'short', possible loss of data
+C:\Users\goodn\source\repos\NeoGC\NeoGC\NeoGC.cpp(291,25): warning C4244: 'initializing': conversion from 'double' to 'short', possible loss of data
+C:\Users\goodn\source\repos\NeoGC\NeoGC\NeoGC.cpp(292,25): warning C4244: 'initializing': conversion from 'double' to 'short', possible loss of data
+  Generating code
+  7 of 398 functions ( 1.8%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+portaudio.lib(pa_front.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_front.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_util.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_util.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_debugprint.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_debugprint.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_hostapis.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_hostapis.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wmme.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wmme.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wdmks.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wdmks.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wasapi.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wasapi.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_allocation.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_allocation.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_stream.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_stream.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_cpuload.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_cpuload.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_converters.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_converters.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_process.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_process.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_waveformat.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_waveformat.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wdmks_utils.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wdmks_utils.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_ringbuffer.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_ringbuffer.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_coinitialize.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_coinitialize.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_dither.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_dither.obj)' or at ''; linking object as if no debug info
+  NeoGC.vcxproj -> C:\Users\goodn\source\repos\NeoGC\x64\Release\NeoGC.exe

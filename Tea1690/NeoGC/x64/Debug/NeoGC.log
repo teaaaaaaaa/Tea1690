@@ -1,0 +1,193 @@
+﻿C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(531,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (NeoGC.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  1690Main.cpp
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,9): warning C4005: 'APIENTRY': macro redefinition
+  (compiling source file '1690Main.cpp')
+      C:\glfw-3.4.bin.WIN64\include\GLFW\glfw3.h(123,11):
+      see previous definition of 'APIENTRY'
+  
+C:\Clone\Tea1690\Tea1690\NeoGC\VPU.h(211,58): warning C4293: '<<': shift count negative or too big, undefined behavior
+  (compiling source file '1690Main.cpp')
+  
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(907,32): warning C4244: '=': conversion from 'std::streamsize' to 'unsigned int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(962,21): warning C4805: '==': unsafe mix of type 'boolean' and type 'bool' in operation
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1294,87): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1294,73): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1294,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1296,88): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1296,74): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1296,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1297,88): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1297,74): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1297,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1299,88): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1299,74): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1299,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1300,89): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1300,75): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1300,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1301,89): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1301,75): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1301,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1302,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1302,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1302,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1304,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1304,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1304,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1310,87): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1310,73): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1310,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1312,94): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1312,80): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1312,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1314,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1314,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1314,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1316,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1316,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1316,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1318,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1318,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1318,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1320,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1320,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1320,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1322,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1322,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1322,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1324,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1324,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1324,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1327,98): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1327,84): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1327,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1329,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1329,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1329,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1331,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1331,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1331,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1333,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1333,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1333,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1335,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1335,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1335,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1337,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1337,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1337,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1339,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1339,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1339,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1341,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1341,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1341,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1344,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1344,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1344,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1346,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1346,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1346,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1348,99): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1348,85): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1348,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1375,121): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1375,107): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1375,50): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1396,117): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1396,103): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1396,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1404,87): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1404,73): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1404,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1406,75): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1406,38): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1973,100): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1973,86): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1973,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1974,105): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1974,91): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1974,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1975,100): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1975,86): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1975,46): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1980,86): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1980,50): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\1690Main.cpp(1982,31): warning C4305: '+=': truncation from 'double' to 'float'
+  tinyfiledialogs.cpp
+  UI.cpp
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(63,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(64,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(65,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(66,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(70,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(71,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(72,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(73,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(77,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(78,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(79,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(80,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(84,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(85,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(86,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(87,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(94,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(95,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(102,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(103,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(110,42): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(111,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(116,47): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(117,85): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(118,96): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(119,104): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(124,47): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(125,86): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(126,96): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(127,105): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(261,12): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(269,19): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(270,19): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(271,20): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(272,20): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(280,48): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(285,48): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(289,39): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(290,40): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(302,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(303,36): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(307,94): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(307,147): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(308,96): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(308,149): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(309,95): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(309,147): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(310,93): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(310,145): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(314,61): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(315,62): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(319,47): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(320,48): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(327,44): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Clone\Tea1690\Tea1690\NeoGC\UI.cpp(328,37): warning C4244: '+=': conversion from 'float' to 'int', possible loss of data
+  Generating Code...
+portaudio.lib(pa_front.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_front.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_util.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_util.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_debugprint.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_debugprint.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_hostapis.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_hostapis.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wmme.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wmme.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wdmks.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wdmks.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wasapi.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wasapi.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_allocation.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_allocation.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_stream.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_stream.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_cpuload.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_cpuload.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_converters.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_converters.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_process.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_process.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_waveformat.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_waveformat.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_wdmks_utils.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_wdmks_utils.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_ringbuffer.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_ringbuffer.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_win_coinitialize.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_win_coinitialize.obj)' or at ''; linking object as if no debug info
+portaudio.lib(pa_dither.obj) : warning LNK4099: PDB '' was not found with 'portaudio.lib(pa_dither.obj)' or at ''; linking object as if no debug info
+LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  NeoGC.vcxproj -> C:\Clone\Tea1690\Tea1690\x64\Debug\1690Console.exe

@@ -1,0 +1,44 @@
+﻿  tinyfiledialogs.cpp
+tinyfiledialogs.obj : error LNK2005: "int __cdecl BrowseCallbackProcW_enum(struct HWND__ *,__int64)" (?BrowseCallbackProcW_enum@@YAHPEAUHWND__@@_J@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_colorChooser(char const *,char * *)" (?tfd_colorChooser@@YAXPEBDPEAPEAD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_inputBox(char const *,char const *,char * *)" (?tfd_inputBox@@YAXPEBD0PEAPEAD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_messageBox(char const *,char const *,char const *,char const *,int *)" (?tfd_messageBox@@YAXPEBD000PEAH@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_openFileDialog(char const *,char * *,int const *,char const * const *,char const *,int const *)" (?tfd_openFileDialog@@YAXPEBDPEAPEADPEBHPEBQEBD02@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tfd_quoteDetected(char const *)" (?tfd_quoteDetected@@YAHPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_replaceSubStr(char const *,char const *,char const *,char *)" (?tfd_replaceSubStr@@YAXPEBD00PEAD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_saveFileDialog(char const *,char * *,int const *,char const * const *,char const *)" (?tfd_saveFileDialog@@YAXPEBDPEAPEADPEBHPEBQEBD0@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tfd_selectFolderDialog(char const *,char * *)" (?tfd_selectFolderDialog@@YAXPEBDPEAPEAD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "void __cdecl tinyfd_beep(void)" (?tinyfd_beep@@YAXXZ) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_colorChooser(char const *,char const *,unsigned char const * const,unsigned char * const)" (?tinyfd_colorChooser@@YAPEADPEBD0QEBEQEAE@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_colorChooserW(wchar_t const *,wchar_t const *,unsigned char const * const,unsigned char * const)" (?tinyfd_colorChooserW@@YAPEA_WPEB_W0QEBEQEAE@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char const * __cdecl tinyfd_getGlobalChar(char const *)" (?tinyfd_getGlobalChar@@YAPEBDPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_getGlobalInt(char const *)" (?tinyfd_getGlobalInt@@YAHPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_inputBox(char const *,char const *,char const *)" (?tinyfd_inputBox@@YAPEADPEBD00@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_inputBoxW(wchar_t const *,wchar_t const *,wchar_t const *)" (?tinyfd_inputBoxW@@YAPEA_WPEB_W00@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_mbcsTo16(char const *)" (?tinyfd_mbcsTo16@@YAPEA_WPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_mbcsTo8(char const *)" (?tinyfd_mbcsTo8@@YAPEADPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_messageBox(char const *,char const *,char const *,char const *,int)" (?tinyfd_messageBox@@YAHPEBD000H@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_messageBoxW(wchar_t const *,wchar_t const *,wchar_t const *,wchar_t const *,int)" (?tinyfd_messageBoxW@@YAHPEB_W000H@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_notifyPopup(char const *,char const *,char const *)" (?tinyfd_notifyPopup@@YAHPEBD00@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_notifyPopupW(wchar_t const *,wchar_t const *,wchar_t const *)" (?tinyfd_notifyPopupW@@YAHPEB_W00@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_openFileDialog(char const *,char const *,int,char const * const *,char const *,int)" (?tinyfd_openFileDialog@@YAPEADPEBD0HPEBQEBD0H@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_openFileDialogW(wchar_t const *,wchar_t const *,int,wchar_t const * const *,wchar_t const *,int)" (?tinyfd_openFileDialogW@@YAPEA_WPEB_W0HPEBQEB_W0H@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_saveFileDialog(char const *,char const *,int,char const * const *,char const *)" (?tinyfd_saveFileDialog@@YAPEADPEBD0HPEBQEBD0@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_saveFileDialogW(wchar_t const *,wchar_t const *,int,wchar_t const * const *,wchar_t const *)" (?tinyfd_saveFileDialogW@@YAPEA_WPEB_W0HPEBQEB_W0@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_selectFolderDialog(char const *,char const *)" (?tinyfd_selectFolderDialog@@YAPEADPEBD0@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_selectFolderDialogW(wchar_t const *,wchar_t const *)" (?tinyfd_selectFolderDialogW@@YAPEA_WPEB_W0@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int __cdecl tinyfd_setGlobalInt(char const *,int)" (?tinyfd_setGlobalInt@@YAHPEBDH@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_utf16to8(wchar_t const *)" (?tinyfd_utf16to8@@YAPEADPEB_W@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_utf16toMbcs(wchar_t const *)" (?tinyfd_utf16toMbcs@@YAPEADPEB_W@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "wchar_t * __cdecl tinyfd_utf8to16(char const *)" (?tinyfd_utf8to16@@YAPEA_WPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * __cdecl tinyfd_utf8toMbcs(char const *)" (?tinyfd_utf8toMbcs@@YAPEADPEBD@Z) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_winUtf8" (?tinyfd_winUtf8@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * tinyfd_version" (?tinyfd_version@@3PADA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * tinyfd_needs" (?tinyfd_needs@@3PADA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_verbose" (?tinyfd_verbose@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_silent" (?tinyfd_silent@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_allowCursesDialogs" (?tinyfd_allowCursesDialogs@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_forceConsole" (?tinyfd_forceConsole@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "int tinyfd_assumeGraphicDisplay" (?tinyfd_assumeGraphicDisplay@@3HA) already defined in NeoGC.obj
+tinyfiledialogs.obj : error LNK2005: "char * tinyfd_response" (?tinyfd_response@@3PADA) already defined in NeoGC.obj
+LINK : fatal error LNK1104: cannot open file 'glut32.lib'
