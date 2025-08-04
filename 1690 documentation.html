@@ -1,0 +1,1389 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1690 documentation 3</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="tea-1690-developer-manual"><strong>tea 1690 Developer Manual</strong></h1>
+<h2 id="table-of-contents"><strong>Table of Contents</strong></h2>
+<ul>
+<li><a href="#about-the-tea-1690">1. About the tea 1690</a>
+<ul>
+<li><a href="#design-philosophy-and-constraints">1.1. Design Philosophy and Constraints</a></li>
+</ul>
+</li>
+<li><a href="#system-architecture">2. System Architecture</a></li>
+<li><a href="#memory-map">3. Memory Map</a>
+<ul>
+<li><a href="#word-addressing">3.1. Word Addressing</a></li>
+<li><a href="#memory-regions">3.2. Memory Regions</a></li>
+</ul>
+</li>
+<li><a href="#the-cpu">4. The CPU</a>
+<ul>
+<li><a href="#core-features--register-banks">4.1. Core Features &amp; Register Banks</a></li>
+<li><a href="#bank-switching-and-subroutine-flow">4.2. Bank Switching and Subroutine Flow</a></li>
+<li><a href="#frame-interrupts">4.3. Frame Interrupts</a></li>
+<li><a href="#instruction-format">4.4. Instruction format</a></li>
+<li><a href="#instruction-set">4.5. Instruction set</a></li>
+<li><a href="#assembler-syntax">4.6. assembler syntax</a></li>
+</ul>
+</li>
+<li><a href="#the-gpu">5. The GPU</a>
+<ul>
+<li><a href="#overview-and-cpu-gpu-interaction">5.1. Overview and CPU-GPU Interaction</a></li>
+<li><a href="#the-object-attribute-memory-oam">5.2. The Object Attribute Memory (OAM)</a></li>
+<li><a href="#tilemap-data-format">5.3. Tilemap Data Format</a></li>
+<li><a href="#understanding-tilemap-layout-and-banking">5.4. Understanding Tilemap Layout and Banking</a></li>
+<li><a href="#gpu-interrupts">5.5. GPU Interrupts</a></li>
+<li><a href="#gpu-performance-slowdown-and-memory-access-rules">5.6. GPU Performance: Slowdown and Memory Access Rules</a></li>
+<li><a href="#how-2d-works">5.7. How 2D works</a></li>
+<li><a href="#affine-transformations">5.8. Affine transformations</a></li>
+<li><a href="#affine-object-clipping-and-bounding-boxes">5.9. Affine Object Clipping and Bounding Boxes</a></li>
+</ul>
+</li>
+<li><a href="#the-apu">6. The APU</a>
+<ul>
+<li><a href="#core-architecture">6.1. Core Architecture</a></li>
+<li><a href="#operational-model">6.2. Operational Model</a></li>
+<li><a href="#apu-processing-and-cpu-interaction">6.3. APU Processing and CPU Interaction</a></li>
+<li><a href="#wavetable-synthesis">6.4. Wavetable Synthesis</a></li>
+<li><a href="#noise-generation">6.5. Noise Generation</a></li>
+</ul>
+</li>
+<li><a href="#io-registers">7. I/O Registers</a>
+<ul>
+<li><a href="#system-and-dma-control">7.1. System and DMA Control</a></li>
+<li><a href="#gpu-control">7.2. GPU Control</a></li>
+<li><a href="#apu-control-and-wavetable-ram">7.3. APU Control and Wavetable RAM</a></li>
+<li><a href="#affine-scrollorigin">7.4. Affine scroll/origin</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="about-the-tea-1690"><strong>1. About the tea 1690</strong></h2>
+<p>The tea 1690 was designed as a hobbyist project to provide an easy-to-learn platform for understanding low-level programming. It emulates the limitations of real retro hardware, such as slow ROM, fast RAM, and instruction cycle delays, to provide a unique challenge.</p>
+<p>The system’s compiler only supports assembly language. This is a deliberate design choice to encourage developers to write efficient, hand-optimized code within the hardware’s constraints, rather than relying on a compiler to generate it automatically.</p>
+<h3 id="design-philosophy-and-constraints"><strong>1.1. Design Philosophy and Constraints</strong></h3>
+<p>The tea 1690 is designed to emulate the experience of developing for a classic 16-bit console. A key part of this experience is working within meaningful hardware limitations.</p>
+<p><strong>ROM Size Limitation:</strong><br>
+The tea 1690’s architecture can theoretically address up to <strong>32 megabytes (MB)</strong> of ROM space. However, the official compiler enforces a standard cartridge size of <strong>1 megabyte (MB)</strong>. This is a deliberate choice for two reasons:</p>
+<ol>
+<li><strong>Authenticity:</strong> In the era this console emulates, cartridges larger than 1-4 MB were rare and expensive. The 1 MB limit encourages developers to use classic asset optimization techniques.</li>
+<li><strong>Hardware Feasibility:</strong> The 1 MB standard ensures compatibility with potential future hardware implementations, such as on an FPGA, where on-chip memory is a significant constraint.</li>
+</ol>
+<p>To exceed this limit, a developer must explicitly use the <code>.NO1MBLIMIT</code> directive in their source code.</p>
+<p><strong>CPU and GPU limitations:</strong><br>
+There is no:</p>
+<ul>
+<li>hardware floating point support</li>
+<li>hardware support for negative numbers</li>
+<li>hardware support for 3D rendering</li>
+</ul>
+<h2 id="system-architecture"><strong>2. System Architecture</strong></h2>
+
+<table>
+<thead>
+<tr>
+<th align="left">Component</th>
+<th align="left">Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>Master Clock</strong></td>
+<td align="left">32 MHz</td>
+</tr>
+<tr>
+<td align="left"><strong>CPU</strong></td>
+<td align="left">16 MHz custom 16-bit CISC/RISC hybrid (executes on even master clock cycles)</td>
+</tr>
+<tr>
+<td align="left"><strong>GPU</strong></td>
+<td align="left">32 MHz fixed-function 2D processor (executes on every master clock cycle)</td>
+</tr>
+<tr>
+<td align="left"><strong>APU</strong></td>
+<td align="left">16 MHz 8-channel fixed-function audio processor (executes on even master clock cycles)</td>
+</tr>
+<tr>
+<td align="left"><strong>Resolution</strong></td>
+<td align="left">256 x 240 pixels</td>
+</tr>
+<tr>
+<td align="left"><strong>Color Depth</strong></td>
+<td align="left">15-bit (32,768 colors)</td>
+</tr>
+<tr>
+<td align="left"><strong>RAM</strong></td>
+<td align="left">128 KB WRAM (Work RAM)</td>
+</tr>
+<tr>
+<td align="left"><strong>VRAM</strong></td>
+<td align="left">128 KB Video RAM</td>
+</tr>
+<tr>
+<td align="left"><strong>ROM</strong></td>
+<td align="left">1 MB (Standard), 32 MB (Maximum)</td>
+</tr>
+<tr>
+<td align="left"><strong>Frame Rate</strong></td>
+<td align="left">60 FPS (533,334 master clocks per frame)</td>
+</tr>
+</tbody>
+</table><h2 id="memory-map"><strong>3. Memory Map</strong></h2>
+<p>The tea 1690 uses a 32-bit address space, organized into 8 distinct memory regions.</p>
+<h3 id="word-addressing"><strong>3.1. Word Addressing</strong></h3>
+<p>The system uses <strong>16-bit word addressing</strong>. All addresses point to a 16-bit word. It is not possible to address individual bytes in hardware, but bytes can be fetched in software if needed.</p>
+<h3 id="memory-regions"><strong>3.2. Memory Regions</strong></h3>
+<p>If a memory region is smaller than its allotted space, its contents will be mirrored.</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Region #</th>
+<th align="left">Name</th>
+<th align="left">Start Address</th>
+<th align="left">End Address</th>
+<th align="left">Size (Words)</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">0</td>
+<td align="left">WRAM</td>
+<td align="left"><code>0x00000000</code></td>
+<td align="left"><code>0x0001FFFF</code></td>
+<td align="left">64K words</td>
+<td align="left">Fast Work RAM.</td>
+</tr>
+<tr>
+<td align="left">1</td>
+<td align="left">IO</td>
+<td align="left"><code>0x01000000</code></td>
+<td align="left"><code>0x010000FF</code></td>
+<td align="left">256 words</td>
+<td align="left">I/O Registers &amp; APU Wavetable RAM.</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">CRAM</td>
+<td align="left"><code>0x02000000</code></td>
+<td align="left"><code>0x020000FF</code></td>
+<td align="left">256 words</td>
+<td align="left">Color Palette RAM.</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">VRAM</td>
+<td align="left"><code>0x03000000</code></td>
+<td align="left"><code>0x0301FFFF</code></td>
+<td align="left">64K words</td>
+<td align="left">Video RAM (Tiles/Tilemaps/Bitmaps).</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">OAM</td>
+<td align="left"><code>0x04000000</code></td>
+<td align="left"><code>0x040007FF</code></td>
+<td align="left">2K words</td>
+<td align="left">Object Attribute Memory.</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">ROM</td>
+<td align="left"><code>0x05000000</code></td>
+<td align="left"><code>0x05FFFFFF</code></td>
+<td align="left">16M words</td>
+<td align="left">Game ROM. Slow access cycles.</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">int RAM</td>
+<td align="left"><code>0x06000000</code></td>
+<td align="left"><code>0x060007FF</code></td>
+<td align="left">2K words</td>
+<td align="left">Data source for GPU Interrupts.</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">Unmapped</td>
+<td align="left"><code>0x07000000</code></td>
+<td align="left"><code>0x07FFFFFF</code></td>
+<td align="left">-</td>
+<td align="left">Open bus, writes are ignored and reads are undefined.</td>
+</tr>
+</tbody>
+</table><h2 id="the-cpu"><strong>4. The CPU</strong></h2>
+<p>The tea 1690 is powered by a custom 16-bit hybrid CISC/RISC CPU running at <strong>16 MHz</strong>. It executes one instruction phase on every even cycle of the 32 MHz master clock. Its design emphasizes direct programmer control over hardware state, including memory access and register bank management.</p>
+<h3 id="core-features--register-banks"><strong>4.1. Core Features &amp; Register Banks</strong></h3>
+<ul>
+<li><strong>Registers:</strong> 8 general-purpose 16-bit registers (<code>R0</code>-<code>R7</code>).</li>
+<li><strong>Register Banks:</strong> The CPU features <strong>3 register banks</strong> (0, 1, and 2), each containing its own independent set of registers <code>R0</code>-<code>R7</code>. Only one bank is active at any time.
+<ul>
+<li><strong>Bank 0:</strong> The default bank for general program execution.</li>
+<li><strong>Bank 1:</strong> The secondary bank, typically used for subroutines.</li>
+<li><strong>Bank 2:</strong> Reserved exclusively for <strong>Frame Interrupts</strong>. It is automatically activated when a frame interrupt occurs.</li>
+</ul>
+</li>
+<li><strong>Stack:</strong> A hardware stack holds up to 8 “return states.” The data pushed to the stack is the same for <code>CALL</code> and Interrupt events.</li>
+</ul>
+<h3 id="bank-switching-and-subroutine-flow"><strong>4.2. Bank Switching and Subroutine Flow</strong></h3>
+<p>Bank switching is primarily handled by <code>CALL</code>, <code>RET</code>, <code>RETI</code>, and interrupt events.</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Event</th>
+<th align="left">Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong><code>CALL</code></strong></td>
+<td align="left">Pushes the current Program Counter (PC) to the stack. <strong>Toggles</strong> the active bank between Bank 0 and Bank 1, swaps to bank 1 if in bank 2. A <code>CALL NS</code> (No Swap) variant exists to prevent this toggle.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>RET #bank_id</code></strong></td>
+<td align="left">Pops a PC from the stack and explicitly switches to the specified bank (0, 1, or 2).</td>
+</tr>
+<tr>
+<td align="left"><strong>Frame Interrupt</strong></td>
+<td align="left">Pushes the current PC to the stack <strong>and</strong> stores the active Bank ID (0 or 1), then switches to <strong>Bank 2</strong>.</td>
+</tr>
+<tr>
+<td align="left"><strong><code>RETI</code></strong></td>
+<td align="left">Pops the PC from the stack and restores the bank ID. Defaults to register bank 0 if no interrupt has occurred.</td>
+</tr>
+</tbody>
+</table><h3 id="frame-interrupts"><strong>4.3. Frame Interrupts</strong></h3>
+<p>If enabled, a frame interrupt provides a clean, dedicated environment for time-critical code.</p>
+<ol>
+<li>At the start of a new frame, the CPU saves the current PC and Bank ID.</li>
+<li>It then switches to <strong>Register Bank 2</strong> and jumps to the address specified in the Frame Interrupt registers (<code>IO 0x6A-0x6B</code>).</li>
+<li>The interrupt routine must end with a <code>RETI</code> instruction to swap to the correct register bank.</li>
+</ol>
+<h3 id="instruction-format"><strong>4.4. Instruction Format</strong></h3>
+<p>Instructions are 16 bits wide, with some opcodes followed by 16-bit or 32-bit immediate values.</p>
+<p><strong>Standard Instruction Word Layout:</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15</th>
+<th align="left">14</th>
+<th align="left">13-11</th>
+<th align="left">10-8</th>
+<th align="left">7-5</th>
+<th align="left">4-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Flag</td>
+<td align="left">Sp.Mode</td>
+<td align="left">Op-Type</td>
+<td align="left">Op-Spec</td>
+<td align="left">Arg 1</td>
+<td align="left">Opcode</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Opcode [4:0]:</strong> The base 5-bit instruction code.</li>
+<li><strong>Arg 1 [7:5]:</strong> The first register argument (source or destination).</li>
+<li><strong>Op-Spec / Arg 2 [10:8]:</strong> Second register argument or other instruction-specific bits.</li>
+<li><strong>Op-Type [13:11]:</strong> Defines the type for arithmetic or comparison operations.</li>
+<li><strong>Sp.Mode [14]:</strong> Enables the special <code>LD ADD</code>/<code>STR ADD</code> addressing mode.</li>
+<li><strong>Flag [15]:</strong> A multi-purpose flag (32-bit arithmetic, relative jump, <code>RETI</code> vs <code>RET</code>).</li>
+</ul>
+<h3 id="instruction-set"><strong>4.5. Instruction Set</strong></h3>
+<p><em>Syntax: <code>Rd</code>=Dest, <code>Rs</code>=Source, <code>#imm</code>=Immediate, <code>%Rp</code>=Register-Pair Address</em></p>
+<h4 id="data-transfer"><strong>Data Transfer</strong></h4>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Opcode</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>LD</code></td>
+<td align="left">5</td>
+<td align="left"><code>LD #imm16, Rd</code></td>
+<td align="left">Load 16-bit immediate into register.</td>
+</tr>
+<tr>
+<td align="left"><code>LD QI</code></td>
+<td align="left">7</td>
+<td align="left"><code>LD QI #imm7, Rs</code></td>
+<td align="left">Load 7-bit Quick Immediate into source register.</td>
+</tr>
+<tr>
+<td align="left"><code>LD</code></td>
+<td align="left">8</td>
+<td align="left"><code>LD Rs, Rd</code></td>
+<td align="left">Copy source register to destination register.</td>
+</tr>
+<tr>
+<td align="left"><code>LD</code></td>
+<td align="left">10</td>
+<td align="left"><code>LD %Rsp, Rd</code></td>
+<td align="left">Load word from memory at address in <code>Rsp</code> pair.</td>
+</tr>
+<tr>
+<td align="left"><code>STR</code></td>
+<td align="left">6</td>
+<td align="left"><code>STR #imm16, %Rsp</code></td>
+<td align="left">Store 16-bit immediate to memory at address in <code>Rsp</code> pair.</td>
+</tr>
+<tr>
+<td align="left"><code>STR</code></td>
+<td align="left">9</td>
+<td align="left"><code>STR Rs, %Rdp</code></td>
+<td align="left">Store register to memory at address in <code>Rdp</code> pair.</td>
+</tr>
+<tr>
+<td align="left"><code>STR</code></td>
+<td align="left">11</td>
+<td align="left"><code>STR %Rsp, %Rdp</code></td>
+<td align="left">Copy word from source memory address to destination.</td>
+</tr>
+<tr>
+<td align="left"><code>LDI</code></td>
+<td align="left">13</td>
+<td align="left"><code>LDI %Rsp, Rd</code></td>
+<td align="left">Load from memory into register, then increment 32-bit source pointer.</td>
+</tr>
+<tr>
+<td align="left"><code>STRI</code></td>
+<td align="left">12</td>
+<td align="left"><code>STRI Rs, %Rdp</code></td>
+<td align="left">Store register to memory, then increment 32-bit destination pointer.</td>
+</tr>
+</tbody>
+</table><h4 id="arithmetic"><strong>Arithmetic</strong></h4>
+<p><em>The <code>OP</code> mnemonic is one of <code>ADD, SUB, AND, OR, XOR, SHL, SHR, MUL</code>.</em><br>
+<em>The <code>L</code> suffix (<code>ADDL</code>, etc.), short for large, performs an operation using 2 16-bit operands and stores the result in a register pair.</em></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Opcode</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>OP</code> / <code>OPL</code></td>
+<td align="left">2</td>
+<td align="left"><code>OP #imm16, Rs, Rd</code></td>
+<td align="left"><code>Rd = Rs OP #imm16</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>OP</code></td>
+<td align="left">3</td>
+<td align="left"><code>OP #imm16, Rs, %Rdp</code></td>
+<td align="left"><code>[Rdp] = Rs OP #imm16</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>OP</code> / <code>OPL</code></td>
+<td align="left">4</td>
+<td align="left"><code>OP Rs, Rd, Rs</code></td>
+<td align="left"><code>Rs = Rd OP Rs</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>INC</code></td>
+<td align="left">24</td>
+<td align="left"><code>INC Rs</code></td>
+<td align="left">Increment register <code>Rs</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>DEC</code></td>
+<td align="left">25</td>
+<td align="left"><code>DEC Rs</code></td>
+<td align="left">Decrement register <code>Rs</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>INC</code></td>
+<td align="left">26</td>
+<td align="left"><code>INC %Rsp</code></td>
+<td align="left">Increment word in memory.</td>
+</tr>
+<tr>
+<td align="left"><code>DEC</code></td>
+<td align="left">27</td>
+<td align="left"><code>DEC %Rsp</code></td>
+<td align="left">Decrement word in memory.</td>
+</tr>
+<tr>
+<td align="left"><code>NOT</code></td>
+<td align="left">23</td>
+<td align="left"><code>NOT Rs, Rd</code></td>
+<td align="left"><code>Rd = ~Rs</code>.</td>
+</tr>
+</tbody>
+</table><p><strong>Note:</strong> SHL makes the result smaller, SHR makes it larger.</p>
+<h4 id="control-flow"><strong>Control Flow</strong></h4>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Opcode</th>
+<th align="left">Syntax / Variants</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>JMP</code>/<code>CALL</code></td>
+<td align="left">15</td>
+<td align="left"><code>JMP #imm32</code> <br> <code>JMPR #imm16</code> <br> <code>CALL #imm32</code> <br> <code>CALLR #imm16</code> <br> <code>CALL NS ...</code></td>
+<td align="left">Unconditional jump or call. <code>R</code> variants are relative. <code>CALL</code> toggles between banks 0 and 1. <code>CALL NS</code> (No Swap) disables the bank toggle.</td>
+</tr>
+<tr>
+<td align="left"><code>RET</code></td>
+<td align="left">22</td>
+<td align="left"><code>RET #bank_id</code></td>
+<td align="left">Pops a PC from the stack and switches to the specified bank (0, 1, or 2). <strong>CRASHES</strong> if bank &gt; 2.</td>
+</tr>
+<tr>
+<td align="left"><code>RETI</code></td>
+<td align="left">22</td>
+<td align="left"><code>RETI</code></td>
+<td align="left"><strong>R</strong>eturn from <strong>I</strong>nterrupt. Pops PC and restores Bank ID.</td>
+</tr>
+</tbody>
+</table><h4 id="comparison-and-branching"><strong>Comparison and Branching</strong></h4>
+<p><em>The <code>&lt;cond&gt;</code> mnemonic is one of <code>LTR, EQR, GRR</code> or their inverted forms (<code>!LTR, !EQR, !GRR</code>)</em></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Opcode</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>CMP</code></td>
+<td align="left">16</td>
+<td align="left"><code>CMP Rs, Rd</code></td>
+<td align="left">Compare two registers (<code>Rd</code> vs <code>Rs</code>).</td>
+</tr>
+<tr>
+<td align="left"><code>CMP</code></td>
+<td align="left">17</td>
+<td align="left"><code>CMP %Rsp, %Rdp</code></td>
+<td align="left">Compare two words from memory.</td>
+</tr>
+<tr>
+<td align="left"><code>JMP</code></td>
+<td align="left">18</td>
+<td align="left"><code>JMP &lt;cond&gt; #imm16, Rs, #target</code></td>
+<td align="left">Jump to <code>#target</code> if <code>Rs &lt;cond&gt; #imm16</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>CALL</code></td>
+<td align="left">19</td>
+<td align="left"><code>CALL &lt;cond&gt; #imm16, Rs, #target</code></td>
+<td align="left">Call <code>#target</code> if <code>Rs &lt;cond&gt; #imm16</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>JMP</code></td>
+<td align="left">20</td>
+<td align="left"><code>JMP &lt;cond&gt;, #target</code></td>
+<td align="left">Jump to <code>#target</code> based on the last <code>CMP</code> result.</td>
+</tr>
+<tr>
+<td align="left"><code>CALL</code></td>
+<td align="left">21</td>
+<td align="left"><code>CALL &lt;cond&gt;, #target</code></td>
+<td align="left">Call <code>#target</code> based on the last <code>CMP</code> result.</td>
+</tr>
+</tbody>
+</table><p><strong>Note:</strong> In GRR comparisons, it checks if operand 1 is greater than operand 2. That means</p>
+<p>JMP GRR #32, R0, $Label</p>
+<p>is equivalent to<br>
+is 32 &gt; R0</p>
+<p>In LTR comparisons, it checks if operand 1 is less than operand 2. That means</p>
+<p>JMP LTR #32, R0, $Label</p>
+<p>is equivalent to<br>
+is 32 &lt; R0</p>
+<h4 id="system"><strong>System</strong></h4>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Opcode</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>NOP</code></td>
+<td align="left">0</td>
+<td align="left"><code>NOP</code></td>
+<td align="left">No operation. Wastes one cycle.</td>
+</tr>
+<tr>
+<td align="left"><code>SYNC</code></td>
+<td align="left">1</td>
+<td align="left"><code>SYNC</code></td>
+<td align="left">Halts CPU execution until the start of the next frame.</td>
+</tr>
+</tbody>
+</table><h4 id="special-addressing-mode-bit-14--1"><strong>Special Addressing Mode (Bit 14 = 1)</strong></h4>
+<p>When Bit 14 of an instruction word is set, a special, powerful addressing mode is activated, overriding the normal opcode. This mode is designed for complex data structure access.</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Mnemonic</th>
+<th align="left">Bit 15</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>STR ADD</code></td>
+<td align="left">0</td>
+<td align="left"><code>STR A, %[B,C]</code></td>
+<td align="left">Store value <code>A</code> at the address calculated from <code>B + C</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>LD ADD</code></td>
+<td align="left">1</td>
+<td align="left"><code>LD %[B,C], A</code></td>
+<td align="left">Load value from address <code>B + C</code> into destination <code>A</code>.</td>
+</tr>
+</tbody>
+</table><p>The operands <code>B</code>, and <code>C</code> are</p>
+<ul>
+<li>registers (R0)</li>
+<li>registers with auto-increment (IR0)</li>
+<li>register pairs (LR0)</li>
+<li>indirect addressing using register pairs (%R0).<br>
+However, <code>A</code> can only either be a register or an indirect register pair address because its type is 1-bit.</li>
+</ul>
+<h3 id="assembler-syntax"><strong>4.6. assembler syntax</strong></h3>
+
+<table>
+<thead>
+<tr>
+<th align="left">Command</th>
+<th align="left">Syntax</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>.NO1MBLIMIT</code></td>
+<td align="left"><code>.NO1MBLIMIT</code></td>
+<td align="left">Removes the 1MB ROM size limit.</td>
+</tr>
+<tr>
+<td align="left"><code>.NAME</code></td>
+<td align="left"><code>.NAME MyGame.bin</code></td>
+<td align="left">Sets the name of the output ROM file.</td>
+</tr>
+<tr>
+<td align="left"><code>.SECTION</code></td>
+<td align="left"><code>.SECTION MyVar 0x10</code></td>
+<td align="left">Declares a symbolic name for a WRAM address.</td>
+</tr>
+<tr>
+<td align="left"><code>.INCLUDE</code></td>
+<td align="left"><code>.INCLUDE path/file.bin*</code></td>
+<td align="left">Includes binary data from a file. <strong>Path must end with <code>*</code></strong>.</td>
+</tr>
+<tr>
+<td align="left"><code>.INSERT #(value)</code></td>
+<td align="left"><code>.INSERT #0xFF</code></td>
+<td align="left">Inserts a word value into the ROM.</td>
+</tr>
+<tr>
+<td align="left"><code>.INSERT $(label)</code></td>
+<td align="left"><code>.INSERT $MyLabel + 0xFF</code></td>
+<td align="left">Inserts a 32-bit label address into the ROM, and supports addition.</td>
+</tr>
+<tr>
+<td align="left"><strong>Labels</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><code>$</code></td>
+<td align="left"><code>$MyLabel:</code></td>
+<td align="left">Declares a pointer label to the current address in ROM.</td>
+</tr>
+<tr>
+<td align="left"><strong>Address References in Operands</strong></td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"><code>.L|(section)</code></td>
+<td align="left"><code>LD #.L|MyVar, R0</code></td>
+<td align="left">Uses the lower 16 bits of a WRAM variable’s address.</td>
+</tr>
+<tr>
+<td align="left"><code>#L|(label)</code></td>
+<td align="left"><code>LD #L|MyLabel + 0xFF, R0</code></td>
+<td align="left">Uses the lower 16 bits of a ROM label’s address. Supports addition.</td>
+</tr>
+<tr>
+<td align="left"><code>#H|(label)</code></td>
+<td align="left"><code>LD #H|MyLabel + 0xFF, R1</code></td>
+<td align="left">Uses the upper 16 bits of a ROM label’s address. Supports addition.</td>
+</tr>
+<tr>
+<td align="left"><code>$(label)</code></td>
+<td align="left"><code>JMP $MyLabel, R1</code></td>
+<td align="left">uses the full ROM label address, only works in JMP and CALL instructions.</td>
+</tr>
+</tbody>
+</table><h2 id="the-gpu"><strong>5. The GPU</strong></h2>
+<p>The GPU is a powerful 32 MHz 2D rendering engine.</p>
+<h3 id="overview-and-cpu-gpu-interaction"><strong>5.1. Overview and CPU-GPU Interaction</strong></h3>
+<p><strong>VRAM layout</strong></p>
+<p>The 128 KB of VRAM (Video RAM) is the primary workspace for the GPU. It is strictly divided into two 64 KB regions, each with a specific purpose. It is critical for the developer to upload data to the correct region.</p>
+<p>Tilemaps cannot cross into the upper 64 kb of VRAM, and linear maps/bitmaps cannot cross into the lower 64 kb of VRAM.</p>
+<ul>
+<li>
+<p><strong>Lower 64 KB: Tilemap Region</strong> (0x03000000 - 0x03007FFF)</p>
+<ul>
+<li>This region is reserved for storing <strong>map data</strong>. This includes the data for Tilemap objects and Affine Tilemap objects.</li>
+</ul>
+</li>
+<li>
+<p><strong>Upper 64 KB: Character (Tile Pattern) Region</strong> (0x03008000 - 0x0300FFFF)</p>
+<ul>
+<li>This region is reserved for storing the <strong>pixel data for graphics</strong>. This includes the 8x8 tile patterns used by all tile-based objects, as well as bitmaps. This region can hold a maximum of 2048 unique 8x8 4bpp tiles and supports a maximum bitmap size of 256 x 512/512 x 256 pixels.</li>
+</ul>
+</li>
+</ul>
+<p><strong>Objects</strong></p>
+<p>The GPU renders the scene by processing a display list of up to <strong>128 objects</strong> defined in Object Attribute Memory (OAM). It reads 4bpp palettized graphics data from VRAM and composes them into a final 15bpp internal framebuffer, which is then sent to the display.</p>
+<h4 id="gpu-fill-rate"><strong>GPU Fill Rate</strong></h4>
+<p>The GPU is capable of drawing an amount of pixels equivalent to <strong>8 full screens per frame</strong> (approximately 4.9 million pixels/sec at 60 FPS). Every pixel drawn by an object, regardless of mode, consumes from this fill rate budget. Complex scenes with many layers of large, overlapping objects can exceed this limit, resulting in slowdown.</p>
+<h4 id="cpu-gpu-interaction-and-bus-contention"><strong>CPU-GPU Interaction and Bus Contention</strong></h4>
+<p>A fundamental aspect of the tea 1690’s architecture is the shared VRAM bus. Both the CPU (via DMA) and the GPU (for rendering) require access to VRAM, but they cannot do so simultaneously.</p>
+<ul>
+<li>
+<p>Therefore, the time the CPU spends on VRAM DMA directly subtracts from the time the GPU has to render the frame. A 25% CPU usage per frame from DMA VRAM transfers leaves the GPU with only 75% of its potential fill rate.</p>
+</li>
+<li>
+<p>For extremely heavy data transfers (&gt;75% of frame time), developers can implement a <strong>30 FPS render cycle</strong> in software, dedicating alternate frames to DMA and rendering to avoid slowdown.</p>
+</li>
+</ul>
+<h3 id="the-object-attribute-memory-oam"><strong>5.2. The Object Attribute Memory (OAM)</strong></h3>
+<p>OAM is a 2K-word block of memory (at <code>0x04000000</code>) that defines up to <strong>128 on-screen objects</strong>. Each object is controlled by an 8-word entry. Mastering OAM is key to unlocking the GPU’s power.</p>
+<h4 id="oam-entry-structure-8-words"><strong>OAM Entry Structure (8 Words)</strong></h4>
+
+<table>
+<thead>
+<tr>
+<th align="left">Slot</th>
+<th align="left">Word</th>
+<th align="left">Primary Function</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>0</strong></td>
+<td align="left"><strong>Attribute 1</strong></td>
+<td align="left">Position, Mode, Flipping, Map Banking</td>
+</tr>
+<tr>
+<td align="left"><strong>1</strong></td>
+<td align="left"><strong>Attribute 2</strong></td>
+<td align="left">Position, Palette, Transparency, Affine Controls</td>
+</tr>
+<tr>
+<td align="left"><strong>2</strong></td>
+<td align="left"><strong>Size</strong></td>
+<td align="left">Object dimensions (in tiles or pixels)</td>
+</tr>
+<tr>
+<td align="left"><strong>3</strong></td>
+<td align="left"><strong>Base Pointer</strong></td>
+<td align="left">Data source address and Tile Pattern Bank</td>
+</tr>
+<tr>
+<td align="left"><strong>4</strong></td>
+<td align="left"><code>dx</code></td>
+<td align="left">Affine Horizontal Scale</td>
+</tr>
+<tr>
+<td align="left"><strong>5</strong></td>
+<td align="left"><code>dy</code></td>
+<td align="left">Affine Vertical Scale</td>
+</tr>
+<tr>
+<td align="left"><strong>6</strong></td>
+<td align="left"><code>dmx</code></td>
+<td align="left">Affine Horizontal Shear</td>
+</tr>
+<tr>
+<td align="left"><strong>7</strong></td>
+<td align="left"><code>dmy</code></td>
+<td align="left">Affine Vertical Shear</td>
+</tr>
+</tbody>
+</table><h4 id="detailed-bitfield-breakdown"><strong>Detailed Bitfield Breakdown</strong></h4>
+<p><strong>Slot 0 (Word 0): Main Attributes</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15-14</th>
+<th align="left">13</th>
+<th align="left">12</th>
+<th align="left">11</th>
+<th align="left">10-9</th>
+<th align="left">8-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">MAP_BANK</td>
+<td align="left">2D_EN</td>
+<td align="left">V_FLIP</td>
+<td align="left">H_FLIP</td>
+<td align="left">MODE</td>
+<td align="left">X_POS</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 8:0 (<code>X_POS</code>):</strong> X-coordinate of the object’s top-left corner.</li>
+<li><strong>Bits 10:9 (<code>MODE</code>):</strong> Rendering mode: <code>0</code>=Linear Map, <code>1</code>=Tilemap, <code>2</code>=Affine, <code>3</code>=Hidden. <strong>The GPU skips rendering hidden objects.</strong></li>
+<li><strong>Bit 11 (<code>H_FLIP</code>), Bit 12 (<code>V_FLIP</code>):</strong> Flips the object. <strong>Ignored in all affine modes.</strong></li>
+<li><strong>Bit 13 (<code>2D_EN</code>):</strong> Affects the <em>Rendered Width</em> of tile-based objects. (See Section 5.4).</li>
+<li><strong>Bits 15:14 (<code>MAP_BANK</code> / Boundary):</strong>
+<ul>
+<li><strong>For Tile-Based Modes:</strong> Selects the <strong>Tilemap Bank Size</strong>.</li>
+<li><strong>For Affine Bitmap Mode:</strong> Selects the <strong>Affine Boundary</strong> behavior.
+<ul>
+<li>0: Wrap to VRAM</li>
+<li>1: zero if outside object size (won’t be transparent if transparency isn’t enabled)</li>
+<li>2: wrap to object size</li>
+<li>3: undefined, will make the object invisible <strong>(that doesn’t mean it takes any less cycles to render than if it were visible)</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p><strong>Slot 1 (Word 1): Secondary Attributes</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15</th>
+<th align="left">14</th>
+<th align="left">13-11</th>
+<th align="left">10</th>
+<th align="left">9</th>
+<th align="left">8-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">AFFINE_CENTER</td>
+<td align="left">TRANS_50</td>
+<td align="left">PAL/AFF_SLOT</td>
+<td align="left">AFFINE_TILE_EN</td>
+<td align="left">TRANS_EN</td>
+<td align="left">Y_POS</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 8:0 (<code>Y_POS</code>):</strong> Y-coordinate.</li>
+<li><strong>Bit 9 (<code>TRANS_EN</code>):</strong> Enables transparency for palette color 0 if set to 1.</li>
+<li><strong>Bit 10 (<code>AFFINE_TILE_EN</code>):</strong> If <code>MODE=2</code>, selects between Affine Tilemap (<code>1</code>) and Affine Bitmap (<code>0</code>).</li>
+<li><strong>Bits 13:11 (<code>PAL/AFF_SLOT</code>):</strong> Selects base palette (0-7) and, for affine objects, the Affine I/O Slot (0-7).</li>
+<li><strong>Bit 14 (<code>TRANS_50</code>):</strong> Enables 50% translucency (alpha blending via color averaging).</li>
+<li><strong>Bit 15 (<code>AFFINE_DEFAULT</code>):</strong> If <code>1</code>, forces affine origin to the object’s center and affine scroll to 0, ignoring the I/O slot.</li>
+</ul>
+<p><strong>Slot 2 (Word 2): Size</strong></p>
+<p>In linear map/tilemap modes:</p>
+<ul>
+<li>bits 0 - 5 control the width in tiles, bits 8 - 11 control the height in tiles.</li>
+</ul>
+<p>In affine bitmap/affine tilemap modes:</p>
+<ul>
+<li>bits 0 - 7 control the width in pixels, bits 8 - 15 control the height in pixels.</li>
+</ul>
+<p><strong>Slot 3 (Word 3): Base Pointer &amp; Tile Pattern Bank</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15</th>
+<th align="left">14-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">PATTERN_BANK</td>
+<td align="left">BASE_POINTER</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bit 15 (<code>PATTERN_BANK</code>):</strong> Selects the <strong>Tile Pattern Bank</strong> (<code>0</code>=lower 1024 tiles, <code>1</code>=upper 1024 tiles).</li>
+<li><strong>Bits 14:0 (<code>BASE_POINTER</code>):</strong> Pointer to data source (base tilemap address, linear map start index, or base address for bitmap in words).</li>
+</ul>
+<h3 id="tilemap-data-format"><strong>5.3. Tilemap Data Format</strong></h3>
+<p>A tilemap is an array of 16-bit entries in VRAM, each defining an 8x8 tile.</p>
+<p><strong>Tile Entry Bitfield (16 bits):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15</th>
+<th align="left">14</th>
+<th align="left">13-11</th>
+<th align="left">10</th>
+<th align="left">9-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">V_FLIP</td>
+<td align="left">H_FLIP</td>
+<td align="left">PALETTE</td>
+<td align="left">(unused)</td>
+<td align="left">TILE_INDEX</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 9:0 (<code>TILE_INDEX</code>):</strong> 10-bit index (0-1023) within the bank selected by the object’s <code>PATTERN_BANK</code>.</li>
+<li><strong>Bit 10 (<code>Reserved</code>):</strong> Unused. Should be set to <code>0</code>.</li>
+<li><strong>Bits 13:11 (<code>PAL_OFFSET</code>):</strong> Palette select (0-7). The object’s base palette is ignored.</li>
+<li><strong>Bits 14:15 (<code>H_FLIP</code>/<code>V_FLIP</code>):</strong> Per-tile flipping. <strong>Ignored in affine tilemap mode.</strong></li>
+</ul>
+<h3 id="understanding-tilemap-layout-and-banking"><strong>5.4. Understanding Tilemap Layout and Banking</strong></h3>
+<p>The tilemap system separates the <strong>Rendered Width</strong> (how the map is drawn) from the <strong>Bank Size</strong> (how map data wraps in memory).</p>
+<ul>
+<li>
+<p><strong>Rendered Width</strong> is fixed by the object’s mode (e.g., 64 tiles wide for a 2D tilemap).</p>
+</li>
+<li>
+<p><strong>Bank Size</strong> is set by <code>MAP_BANK</code> in OAM and allows tilemaps to wrap within smaller areas than the 32768 tile region called banks, useful for scrolling. The bank size can be one of 4 options:</p>
+<ul>
+<li>0: 2048 tile banks<br>
+<strong>equivalent to 64 x 32 or 128 x 16 tilemaps</strong></li>
+<li>1: 4096 tile banks<br>
+<strong>equivalent to 64 x 64 or 128 x 32 tilemaps</strong></li>
+<li>2: 8192 tile banks<br>
+<strong>equivalent to 64 x 128 or 128 x 64 tilemaps</strong></li>
+<li>3: 16384 tile banks<br>
+<strong>equivalent to 64 x 256 or 128 x 128 tilemaps</strong></li>
+</ul>
+</li>
+<li>
+<p>the <strong>Current bank</strong> is the base tile divided by the bank size.</p>
+</li>
+</ul>
+<h3 id="gpu-interrupts"><strong>5.5. GPU Interrupts</strong></h3>
+<p>The GPU can trigger up to 8 interrupts on every row drawn to modify graphics parameters mid-frame, using entries from interrupt RAM. This is useful for raster effects.</p>
+<p>Each interrupt fetches data from its own 256-word block in interrupt RAM, the upper 16 words of each block unused.</p>
+<h3 id="gpu-performance-slowdown-and-memory-access-rules"><strong>5.6: GPU Performance: Slowdown and Memory Access Rules</strong></h3>
+<p>Understanding the GPU’s performance characteristics and its memory access limitations is crucial for writing stable, high-performance software for the <code>tea 1690</code>.</p>
+<h4 id="gpu-slowdown"><strong>GPU Slowdown</strong></h4>
+<p>GPU slowdown occurs when the list of objects in OAM is too complex for the GPU to render completely within a single frame’s active rendering time.</p>
+<ul>
+<li><strong>GPU-Only Slowdown:</strong> It is possible for the GPU to experience slowdown while the CPU continues to run at full speed. This will manifest as visual stuttering and jank, even if the game logic feels responsive.</li>
+<li><strong>State Carryover:</strong> If the GPU has not finished rendering its object list by the end of a frame, its internal state <strong>carries over</strong> to the next frame. It will attempt to resume rendering from where it left off.</li>
+<li><strong>CPU Slowdown Impact:</strong> If the CPU slows down (e.g., due to complex game logic), it is highly likely that the GPU will also experience slowdown, as the CPU’s main loop is what drives the frame timing.</li>
+</ul>
+<p>The primary cause of GPU slowdown is an excessive number of on-screen pixels being drawn per frame (high “fill rate”), especially from complex affine objects.</p>
+<h4 id="memory-access-restrictions-what-to-avoid"><strong>Memory Access Restrictions: What to Avoid</strong></h4>
+<p>The GPU requires exclusive access to all graphics-related memory regions while it is actively rendering. This creates a strict rule for the programmer: <strong>all graphics memory must be prepared <em>before</em> the GPU is enabled for the frame.</strong></p>
+<p>While the GPU’s <code>GPU_EN</code> flag (<code>IO 0x06</code>, bit 0) is set to <code>1</code>, the following memory regions are <strong>locked</strong> and cannot be accessed by the CPU:</p>
+<ul>
+<li><strong>VRAM (Video RAM)</strong> - Region 3</li>
+<li><strong>OAM (Object Attribute Memory)</strong> - Region 4</li>
+<li><strong>CRAM (Color RAM / Palettes)</strong> - Region 2</li>
+<li><strong>Interrupt RAM</strong> - Region 6</li>
+<li><strong>GPU I/O Registers</strong> (except the GPU control register and global brightness)</li>
+</ul>
+<p><strong>Consequences of incorrect access:</strong></p>
+<ul>
+<li>Any <strong>write</strong> attempt by the CPU to these locked regions will be <strong>completely ignored</strong>.</li>
+<li>Any <strong>read</strong> attempt from these locked regions will return <strong>open bus</strong> (unpredictable, garbage data).</li>
+</ul>
+<p><strong>Correct Workflow:</strong><br>
+The GPU is automatically disabled at the start of every frame. The correct development pattern is:</p>
+<ol>
+<li><strong>Prepare Data (GPU Disabled):</strong> Perform all DMA transfers to VRAM, update OAM entries, modify palettes in CRAM, and set up Interrupt RAM.</li>
+<li><strong>Enable GPU:</strong> Once all data for the frame is ready, write <code>1</code> to the <code>GPU_EN</code> flag. The GPU will then take over and render the scene.</li>
+<li><strong>Run Game Logic:</strong> The CPU can continue running game logic in parallel (respecting bus contention rules).</li>
+<li><strong><code>SYNC</code>:</strong> Wait for the next frame, at which point the GPU will be disabled again, and the cycle can repeat.</li>
+</ol>
+<h3 id="how-2d-works"><strong>5.7: How 2D works</strong></h3>
+<ul>
+<li>
+<p>regardless of the mode, 2D works by selecting the current row with</p>
+<ul>
+<li>base tilemap/bitmap address divided by 64 (or base tilemap/bitmap address divided by 128 depending on the mode)</li>
+</ul>
+</li>
+<li>
+<p>the offset from the base address is wrapped to the selected row when fetching tiles or bitmap data. This allows tilemaps/bitmaps to wrap horizontally.</p>
+</li>
+</ul>
+<hr>
+<h3 id="affine-transformations"><strong>5.8: Affine Transformations</strong></h3>
+<p>Affine transformations (scaling, rotation, and shearing) on the <code>tea 1690</code> are controlled by four parameters: Horizontal Scale (<code>dx</code>), Vertical Scale (<code>dy</code>), Horizontal Shear (<code>dmx</code>), and Vertical Shear (<code>dmy</code>). These operations use a <strong>8.8 fixed-point number format</strong>.</p>
+<h4 id="the-8.8-fixed-point-format"><strong>The 8.8 Fixed-Point Format</strong></h4>
+<p>All affine parameters are 16-bit signed values, but they are interpreted as fixed-point numbers. The upper 8 bits represent the integer part, and the lower 8 bits represent the fractional part.</p>
+<ul>
+<li>A value of <strong><code>256</code></strong> (or <code>0x0100</code>) represents <strong>1.0</strong>.</li>
+<li>A value of <strong><code>128</code></strong> (or <code>0x0080</code>) represents <strong>0.5</strong>.</li>
+<li>A value of <strong><code>512</code></strong> (or <code>0x0200</code>) represents <strong>2.0</strong>.</li>
+</ul>
+<p>This format applies to all four affine registers.</p>
+<h4 id="scaling"><strong>Scaling</strong></h4>
+<p>The scale registers (<code>dx</code> for horizontal, <code>dy</code> for vertical) control the size of the object. The value determines how many source pixels are stepped over for each destination pixel drawn.</p>
+<ul>
+<li>To make an object appear at its <strong>normal size (100%)</strong>, set the scale value to <strong>256 (1.0)</strong>.</li>
+<li>To make an object <strong>twice as wide</strong>, set <code>dx</code> to <strong>128 (0.5)</strong>. The hardware steps through the source graphic at half-speed.</li>
+<li>To make an object <strong>half as tall</strong>, set <code>dy</code> to <strong>512 (2.0)</strong>. The hardware steps through the source graphic at double-speed, skipping every other pixel.</li>
+</ul>
+<p><strong>Practical Scaling Values:</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Desired Scale</th>
+<th align="left">Value to Write (<code>dx</code> or <code>dy</code>)</th>
+<th align="left">Calculation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">100% (Normal)</td>
+<td align="left"><strong>256</strong></td>
+<td align="left"><code>256 / 1.0</code></td>
+</tr>
+<tr>
+<td align="left">200% (Double)</td>
+<td align="left"><strong>128</strong></td>
+<td align="left"><code>256 / 2.0</code></td>
+</tr>
+<tr>
+<td align="left">50% (Half)</td>
+<td align="left"><strong>512</strong></td>
+<td align="left"><code>256 / 0.5</code></td>
+</tr>
+<tr>
+<td align="left">25% (Quarter)</td>
+<td align="left"><strong>1024</strong></td>
+<td align="left"><code>256 / 0.25</code></td>
+</tr>
+<tr>
+<td align="left">150%</td>
+<td align="left"><strong>170</strong></td>
+<td align="left"><code>floor(256 / 1.5)</code></td>
+</tr>
+</tbody>
+</table><h4 id="shearing-skewing"><strong>Shearing (Skewing)</strong></h4>
+<p>The shear registers (<code>dmx</code> for horizontal, <code>dmy</code> for vertical) control the skew of the object. The value determines how many pixels the coordinate is shifted for each line.</p>
+<ul>
+<li>A shear value of <strong>0</strong> means no skew.</li>
+<li>A <code>dmx</code> (Horizontal Shear) value of <strong>256 (1.0)</strong> means that for every vertical pixel you move down from the origin, the horizontal coordinate will be shifted by 1 pixel.</li>
+<li>A <code>dmy</code> (Vertical Shear) value of <strong>512 (2.0)</strong> means that for every horizontal pixel you move across from the origin, the vertical coordinate will be shifted by 2 pixels.</li>
+</ul>
+<h4 id="hardware-transformation-equations"><strong>Hardware Transformation Equations</strong></h4>
+<p>The following are the exact equations used by the GPU to transform a destination pixel coordinate into a source texture coordinate. These equations incorporate the affine parameters, the object’s origin point, and the affine scroll values.</p>
+<ul>
+<li>
+<p><strong>Horizontal Source Coordinate:</strong></p>
+<pre><code>source_X = scroll_H + (shear_H * (dst_Y - origin_Y)) + (scale_H * (dst_X - origin_X))
+</code></pre>
+</li>
+<li>
+<p><strong>Vertical Source Coordinate:</strong></p>
+<pre><code>source_Y = scroll_V + (scale_V * (dst_Y - origin_Y)) + (shear_V * (dst_X - origin_X))
+</code></pre>
+</li>
+</ul>
+<hr>
+<h3 id="affine-object-clipping-and-bounding-boxes"><strong>5.9: Affine Object Clipping and Bounding Boxes</strong></h3>
+<p>A fundamental rule for all affine objects (MODE=2) is that they are <strong>clipped by their own bounding box</strong>. The final rendered graphic cannot draw any pixels outside of the on-screen rectangle defined by the object’s X_POS, Y_POS, Width, and Height from its OAM entry.</p>
+<h4 id="the-clipping-rule"><strong>The Clipping Rule</strong></h4>
+<p>This clipping occurs regardless of the transformation applied. For example, if you have a 32x32 pixel object and rotate it by 45 degrees, the corners of the rotated graphic will now extend beyond the original 32x32 pixel bounding box. The GPU will <strong>clip off</strong> these extended corners.</p>
+<p>This behavior is a hardware limitation designed to prevent a single transformed object from causing slowdown and graphical glitches.</p>
+<h4 id="practical-implications-and-solutions"><strong>Practical Implications and Solutions</strong></h4>
+<p>This rule has a direct impact on how you must set up rotating or scaled objects to prevent unwanted visual artifacts.</p>
+<p><strong>The Solution: Use a Larger Bounding Box.</strong></p>
+<p>To prevent clipping, the object’s Width and Height (defined in OAM Slot 2) must be large enough to fully contain the source texture after its largest possible transformation.</p>
+<p><strong>Example: Rotating a 32x32 Sprite</strong></p>
+<ol>
+<li>
+<p><strong>The Problem:</strong> You have a 32x32 pixel sprite that you want to rotate freely. If you set the object’s bounding box to 32x32, the corners will be clipped as soon as it rotates.</p>
+</li>
+<li>
+<p><strong>The Fix:</strong> You must set the object’s bounding box to be larger. To fully contain a 32x32 sprite at any rotation, the required bounding box is approximately 46x46 pixels.</p>
+</li>
+<li>
+<p><strong>Setup:</strong></p>
+<ul>
+<li>
+<p>Your source graphic is still 32x32 pixels.</p>
+</li>
+<li>
+<p>In OAM Slot 2, you set the object’s Width and Height to 45 (which means 46 pixels).</p>
+</li>
+<li>
+<p>The GPU now has a large enough “canvas” to draw the rotated sprite without any clipping.</p>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="the-apu"><strong>6. The APU</strong></h2>
+<h3 id="core-architecture"><strong>6.1. Core Architecture</strong></h3>
+<p>The APU is an 8-channel sound generator with a hybrid design:</p>
+<ul>
+<li><strong>2 PCM Channels (Channels 1-2):</strong> For playback of 8/16-bit signed samples.</li>
+<li><strong>6 Wavetable/Noise Channels (Channels 3-8):</strong> For melodic elements using custom waveforms or LFSR-based noise.</li>
+</ul>
+<p>All audio is outputted at 32,820 hz, however, the sample rate of each channel is fixed-point. This means the output sample rate is slightly higher.</p>
+<h3 id="operational-model"><strong>6.2. Operational Model</strong></h3>
+<p>The APU uses a “fire-and-forget” model. Once a channel is enabled via the <code>APU_CTRL</code> register, it will play its sound indefinitely until disabled. The <code>APU_CTRL</code> register state persists across frames.</p>
+<h3 id="apu-processing-and-cpu-interaction"><strong>6.3. APU Processing and CPU Interaction</strong></h3>
+<ul>
+<li>At the <strong>end of each frame</strong>, if the APU is enabled, it begins its processing window.</li>
+<li>During this window, APU I/O registers are inaccessible for a minimum of <strong>547 cycles</strong>, but this can vary depending on which channels are active.</li>
+<li>If only wavetable/noise channels are active, the <strong>CPU is not halted</strong>.</li>
+<li>If PCM channels are active, the <strong>CPU is halted</strong> during this window while sample data is fetched. <strong>PCM samples take longer to process than wavetables.</strong></li>
+<li>The APU has priority over DMA and will <strong>interrupt (pause and resume) DMA transfers</strong>.</li>
+</ul>
+<h3 id="wavetable-synthesis"><strong>6.4. Wavetable Synthesis</strong></h3>
+<p>Channels 3-8 each have a <strong>dedicated, non-sharable wavetable</strong> stored in a special section of I/O memory (<code>0x01000080</code> onwards). Each wavetable is 32 bytes (32 8-bit signed samples).</p>
+<h3 id="noise-generation"><strong>6.5. Noise Generation</strong></h3>
+<p>When switched to noise mode, a channel uses its dedicated <strong>16-bit LFSR</strong> to generate pseudo-random noise. The LFSR formula is: <code>bit = (val ^ (val&gt;&gt;1) ^ (val&gt;&gt;3) ^ (val&gt;&gt;12)) &amp; 1; new_val = (val&gt;&gt;1) | (bit&lt;&lt;15);</code></p>
+<h2 id="io-registers"><strong>7. I/O Registers</strong></h2>
+<p>I/O registers reside in memory <strong>Region 1</strong> (<code>0x01000000</code> - <code>0x010000FF</code>).</p>
+<h3 id="system-and-dma-control"><strong>7.1. System and DMA Control</strong></h3>
+<ul>
+<li>
+<p><code>0x0001</code> - DMA source address low</p>
+</li>
+<li>
+<p><code>0x0002</code> - DMA source address high. Bit 11 is the Source Increment Flag (<code>0</code>=Fixed, <code>1</code>=Increment).</p>
+</li>
+<li>
+<p><code>0x0003</code> - DMA destination address low</p>
+</li>
+<li>
+<p><code>0x0004</code> - DMA destination address high</p>
+</li>
+<li>
+<p><code>0x0005</code> - DMA length (a length greater than 0 will initiate a DMA transfer)</p>
+</li>
+<li>
+<p><strong><code>0x0038</code>: INPUT_P1.</strong> Controller 1 Input.</p>
+</li>
+<li>
+<p><strong><code>0x006A</code>: FRAMEINT_L.</strong> low 16 bits of address to jump to whenever a frame interrupt occurs.</p>
+</li>
+<li>
+<p><strong><code>0x006B</code>: FRAMEINT_H.</strong> high 15 bits of address to jump to whenever a frame interrupt occurs. The last bit enables frame interrupts.</p>
+</li>
+</ul>
+<h3 id="gpu-control"><strong>7.2. GPU Control</strong></h3>
+<ul>
+<li><strong><code>0x0006</code>: GPU_CTRL.</strong>
+<ul>
+<li>Bit 0: GPU Enable</li>
+<li>Bit 1: Global Interrupt Enable</li>
+<li>bit 2: GPU status (1 means the GPU isn’t finished rendering the frame)</li>
+</ul>
+</li>
+<li><strong><code>0x006C</code>: BRIGHT_CTRL.</strong> Controls global brightness (6-bit signed) and palette bright/dark flags (<code>0</code>=Brighten, <code>1</code>=Darken).</li>
+<li><strong><code>0x006D</code>-<code>0x006F</code>: PALETTE_BRIGHTNESS_1,2,3.</strong> Tightly packed 6-bit signed brightness values for palettes 0-7.</li>
+</ul>
+<hr>
+<h3 id="apu-control-and-wavetable-ram"><strong>7.3: APU Control and Wavetable RAM</strong></h3>
+<p>The APU registers and dedicated Wavetable RAM occupy the I/O space from <code>0x0007</code> to <code>0x00DF</code>.</p>
+<h4 id="x0007---apu_ctrl-apu-master-control-register"><strong><code>0x0007</code> - APU_CTRL: APU Master Control Register</strong></h4>
+<p>This single register is the master control for the entire APU. It enables the unit itself and each of the 8 individual channels. Its state persists across frames until changed by the CPU.</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15-9</th>
+<th align="left">8</th>
+<th align="left">7</th>
+<th align="left">6</th>
+<th align="left">5</th>
+<th align="left">4</th>
+<th align="left">3</th>
+<th align="left">2</th>
+<th align="left">1</th>
+<th align="left">0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">Unused</td>
+<td align="left">CH8_EN</td>
+<td align="left">CH7_EN</td>
+<td align="left">CH6_EN</td>
+<td align="left">CH5_EN</td>
+<td align="left">CH4_EN</td>
+<td align="left">CH3_EN</td>
+<td align="left">CH2_EN</td>
+<td align="left">CH1_EN</td>
+<td align="left">APU_EN</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bit 0 (<code>APU_EN</code>):</strong> Main APU Enable. If this bit is <code>0</code>, the entire APU is disabled and outputs silence. If <code>1</code>, the APU is active.</li>
+<li><strong>Bit 1 (<code>CH1_EN</code>):</strong> Enable for Channel 1 (PCM).</li>
+<li><strong>Bit 2 (<code>CH2_EN</code>):</strong> Enable for Channel 2 (PCM).</li>
+<li><strong>Bits 8:3 (<code>CHx_EN</code>):</strong> Enable flags for Channels 3 through 8 (Wavetable/Noise).</li>
+</ul>
+<h4 id="x0008---0x0013-apu-pcm-channels-1--2"><strong><code>0x0008</code> - <code>0x0013</code>: APU PCM Channels 1 &amp; 2</strong></h4>
+<p>The I/O space is divided into two identical 6-word blocks for the two PCM channels.</p>
+<p><strong>Channel Register Layout (Channel 1: <code>0x08-0x0D</code>, Channel 2: <code>0x0E-0x13</code>):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Offset</th>
+<th align="left">Register Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>+0</code></td>
+<td align="left">SRC_ADDR_L</td>
+<td align="left">Sample Source Address [15:0] (Lower 16 bits).</td>
+</tr>
+<tr>
+<td align="left"><code>+1</code></td>
+<td align="left">SRC_ADDR_H_FLAGS</td>
+<td align="left">Sample Source Address [High] &amp; Format/Loop Flags.</td>
+</tr>
+<tr>
+<td align="left"><code>+2</code></td>
+<td align="left">PAN_VOL</td>
+<td align="left">Panning &amp; Volume.</td>
+</tr>
+<tr>
+<td align="left"><code>+3</code></td>
+<td align="left">SAMPLE_RATE</td>
+<td align="left">Playback frequency (16-bit fixed point).</td>
+</tr>
+<tr>
+<td align="left"><code>+4</code></td>
+<td align="left">LENGTH</td>
+<td align="left">Sample length in words.</td>
+</tr>
+<tr>
+<td align="left"><code>+5</code></td>
+<td align="left">LOOP_OFFSET</td>
+<td align="left">Start offset from the beginning of the sample for looping.</td>
+</tr>
+</tbody>
+</table><p><strong>Bitfield for <code>SRC_ADDR_H_FLAGS</code> Register (<code>0x0009</code>, <code>0x000F</code>):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15</th>
+<th align="left">14</th>
+<th align="left">13-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">LOOP</td>
+<td align="left">PCM_MODE</td>
+<td align="left">ADDR_H</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 13:0 (<code>ADDR_H</code>):</strong> Upper 14 bits of the sample source address.</li>
+<li><strong>Bit 14 (<code>PCM_MODE</code>):</strong> Sets the sample format.
+<ul>
+<li><code>0</code>: 8-bit signed PCM (two samples per word).</li>
+<li><code>1</code>: 16-bit signed PCM (one sample per word).</li>
+</ul>
+</li>
+<li><strong>Bit 15 (<code>LOOP</code>):</strong> <code>0</code> = Play once, <code>1</code> = Loop.</li>
+</ul>
+<h4 id="x0014---0x002b-apu-wavetablenoise-channels-3---8"><strong><code>0x0014</code> - <code>0x002B</code>: APU Wavetable/Noise Channels 3 - 8</strong></h4>
+<p>The I/O space from <code>0x0014</code> to <code>0x002B</code> is divided into 6 identical 4-word blocks, one for each wavetable/noise channel.</p>
+<p><strong>Channel Register Layout (e.g., Ch 3: <code>0x14-0x17</code>, Ch 4: <code>0x18-0x1B</code>, etc.):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Offset</th>
+<th align="left">Register Name</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><code>+0</code></td>
+<td align="left">SAMPLE_RATE</td>
+<td align="left">Base frequency/pitch of the note or noise.</td>
+</tr>
+<tr>
+<td align="left"><code>+1</code></td>
+<td align="left">VOLUME</td>
+<td align="left">Left and Right channel volume.</td>
+</tr>
+<tr>
+<td align="left"><code>+2</code></td>
+<td align="left">WAVE_CTRL</td>
+<td align="left">Channel mode control and sweep amount.</td>
+</tr>
+<tr>
+<td align="left"><code>+3</code></td>
+<td align="left">SWEEP_RATE</td>
+<td align="left">Frequency and Volume sweep rate/counter.</td>
+</tr>
+</tbody>
+</table><p><strong>Bitfield for <code>VOLUME</code> Register (e.g., <code>0x0015</code>):</strong><br>
+<code>Bit: 15...........8 7............0</code><br>
+<code>+----------------+------------------+</code><br>
+<code>| LEFT_VOLUME | RIGHT_VOLUME |</code><br>
+<code>+----------------+------------------+</code></p>
+<ul>
+<li><strong>Bits 7:0 (<code>RIGHT_VOLUME</code>):</strong> 8-bit volume for the right speaker.</li>
+<li><strong>Bits 15:8 (<code>LEFT_VOLUME</code>):</strong> 8-bit volume for the left speaker.</li>
+</ul>
+<p><strong>Bitfield for <code>WAVE_CTRL</code> Register (e.g., <code>0x0016</code>):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15-10</th>
+<th align="left">9-5</th>
+<th align="left">4</th>
+<th align="left">3</th>
+<th align="left">2-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">VOL_SWEEP</td>
+<td align="left">FREQ_SWEEP</td>
+<td align="left">RESET</td>
+<td align="left">W/N_FLAG</td>
+<td align="left">Unused</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 2:0 (<code>Unused</code>):</strong> These bits are unused.</li>
+<li><strong>Bit 3 (<code>W/N_FLAG</code>):</strong> Wavetable/Noise Flag. <code>0</code> = Wavetable Synthesis, <code>1</code> = LFSR Noise.</li>
+<li><strong>Bit 4 (<code>RESET</code>):</strong> A “key on” trigger. Writing <code>1</code> to this bit resets the waveform phase and all sweep counters for the channel. This is a momentary trigger and does not need to be cleared by software.</li>
+<li><strong>Bits 9:5 (<code>FREQ_SWEEP</code>):</strong> 5-bit signed value determining how much the frequency changes on each sweep step.</li>
+<li><strong>Bits 15:10 (<code>VOL_SWEEP</code>):</strong> 6-bit signed value determining how much the volume changes on each sweep step.</li>
+</ul>
+<p><strong>Bitfield for <code>SWEEP_RATE</code> Register (e.g., <code>0x0017</code>):</strong></p>
+
+<table>
+<thead>
+<tr>
+<th align="left">15-8</th>
+<th align="left">7-0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left">VOL_SWEEP_RATE</td>
+<td align="left">FREQ_SWEEP_RATE</td>
+</tr>
+</tbody>
+</table><ul>
+<li><strong>Bits 7:0 (<code>FREQ_SWEEP_RATE</code>):</strong> Frequency sweep rate. The frequency is updated every <code>N+1</code> samples. A value of <code>0</code> means the frequency is updated on every sample.</li>
+<li><strong>Bits 15:8 (<code>VOL_SWEEP_RATE</code>):</strong> Volume sweep rate. The volume is updated every <code>N+1</code> samples. A value of <code>0</code> means the volume is updated on every sample.</li>
+</ul>
+<h4 id="x0080---0x00df-dedicated-wavetable-ram"><strong><code>0x0080</code> - <code>0x00DF</code>: Dedicated Wavetable RAM</strong></h4>
+<p>This 96-word (192-byte) block of RAM is dedicated to storing the <strong>6 private waveforms</strong> for the wavetable synthesizer channels. Each channel is mapped to its own 16-word (32-byte) block.</p>
+
+<table>
+<thead>
+<tr>
+<th align="left">Channel #</th>
+<th align="left">Assigned Wavetable</th>
+<th align="left">Word Address Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left"><strong>3</strong></td>
+<td align="left">Wavetable 0</td>
+<td align="left"><code>0x0080</code> - <code>0x008F</code></td>
+</tr>
+<tr>
+<td align="left"><strong>4</strong></td>
+<td align="left">Wavetable 1</td>
+<td align="left"><code>0x0090</code> - <code>0x009F</code></td>
+</tr>
+<tr>
+<td align="left"><strong>5</strong></td>
+<td align="left">Wavetable 2</td>
+<td align="left"><code>0x00A0</code> - <code>0x00AF</code></td>
+</tr>
+<tr>
+<td align="left"><strong>6</strong></td>
+<td align="left">Wavetable 3</td>
+<td align="left"><code>0x00B0</code> - <code>0x00BF</code></td>
+</tr>
+<tr>
+<td align="left"><strong>7</strong></td>
+<td align="left">Wavetable 4</td>
+<td align="left"><code>0x00C0</code> - <code>0x00CF</code></td>
+</tr>
+<tr>
+<td align="left"><strong>8</strong></td>
+<td align="left">Wavetable 5</td>
+<td align="left"><code>0x00D0</code> - <code>0x00DF</code></td>
+</tr>
+</tbody>
+</table><hr>
+<h3 id="affine-scrollorigin"><strong>7.4: Affine scroll/origin</strong></h3>
+<ul>
+<li>
+<p>Affine scrolling is <strong>not the same</strong> as scrolling the object itself. It controls the offset of the bitmaps/tilemaps rendered within the object’s boundaries.</p>
+</li>
+<li>
+<p>Affine origins are signed and start from the top left corner of the object.</p>
+</li>
+</ul>
+<p>Objects each have their own scale/shear parameters, but affine scrolling and origins are limited to 8 slots ranging from <code>0x00039</code> to <code>0x0068</code>. If the <strong>AFFINE_DEFAULT</strong> flag is not set, one of 6-word blocks can be chosen for the affine scroll and origin parameters, each organized like so:</p>
+<ul>
+<li>0 - 1: affine scroll X</li>
+<li>2 - 3: affine scroll Y</li>
+<li>4: affine origin X</li>
+<li>5: affine origin Y</li>
+</ul>
+</div>
+</body>
+
+</html>
