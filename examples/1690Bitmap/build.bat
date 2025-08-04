@@ -1,0 +1,2 @@
+1690Compiler code\1690BitmapDisplay.asm
+pause
