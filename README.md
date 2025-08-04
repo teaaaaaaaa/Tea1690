@@ -1,0 +1,1 @@
+- The source code was built using visual studio 2022. To access it, open the .sln files.
