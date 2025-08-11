@@ -762,7 +762,14 @@ void setSImmediate()
         }
     }
     else
+    {
+        match = false;
+        codeMatch = false;
+        tokenIndex = 0;
+        instructionIndex++;
+        outputInstruction = 0;
         std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+    }
 }
 
 void setSImmediateNoIndirect()
@@ -811,7 +818,14 @@ void setSImmediateNoIndirect()
         }
     }
     else
+    {
+        match = false;
+        codeMatch = false;
+        tokenIndex = 0;
+        instructionIndex++;
+        outputInstruction = 0;
         std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+    }
 }
 
 void setSFImmediate()
@@ -859,7 +873,14 @@ void setSFImmediate()
         //fileSizeCount++;
     }
     else
+    {
+        match = false;
+        codeMatch = false;
+        tokenIndex = 0;
+        instructionIndex++;
+        outputInstruction = 0;
         std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+    }
 }
 
 void setSFImmediateNoIndirect()
@@ -892,7 +913,14 @@ void setSFImmediateNoIndirect()
         fileSizeCount += 2;
     }
     else
+    {
+        match = false;
+        codeMatch = false;
+        tokenIndex = 0;
+        instructionIndex++;
+        outputInstruction = 0;
         std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+    }
 }
 
 void getQuickImmediate()

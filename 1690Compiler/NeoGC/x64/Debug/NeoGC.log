@@ -2,18 +2,16 @@
   1690Compiler.cpp
 C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(546,66): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
 C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(740,61): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(803,61): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(842,57): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(890,57): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1308,51): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1330,95): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1346,74): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1420,54): warning C4244: '=': conversion from 'unsigned short' to 'unsigned char', possible loss of data
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1432,164): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1436,165): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1440,120): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1452,79): warning C4333: '>>': right shift by too large amount, data loss
-C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1529,38): warning C4244: '=': conversion from 'unsigned short' to 'unsigned char', possible loss of data
-  tinyfiledialogs.cpp
-  Generating Code...
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(810,61): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(856,57): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(911,57): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1336,51): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1358,95): warning C4267: '+=': conversion from 'size_t' to 'unsigned int', possible loss of data
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1374,74): warning C4267: '=': conversion from 'size_t' to 'unsigned char', possible loss of data
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1448,54): warning C4244: '=': conversion from 'unsigned short' to 'unsigned char', possible loss of data
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1460,164): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1464,165): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1468,120): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1480,79): warning C4333: '>>': right shift by too large amount, data loss
+C:\Users\goodn\source\repos\1690Compiler\NeoGC\1690Compiler.cpp(1557,38): warning C4244: '=': conversion from 'unsigned short' to 'unsigned char', possible loss of data
   NeoGC.vcxproj -> C:\Users\goodn\source\repos\1690Compiler\x64\Debug\1690Compiler.exe

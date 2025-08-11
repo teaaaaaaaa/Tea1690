@@ -1084,30 +1084,28 @@ The GPU is automatically disabled at the start of every frame. The correct devel
 <p>I/O registers reside in memory <strong>Region 1</strong> (<code>0x01000000</code> - <code>0x010000FF</code>).</p>
 <h3 id="system-and-dma-control"><strong>7.1. System and DMA Control</strong></h3>
 <ul>
-<li>
-<p><code>0x0001</code> - DMA source address low</p>
-</li>
-<li>
-<p><code>0x0002</code> - DMA source address high. Bit 11 is the Source Increment Flag (<code>0</code>=Fixed, <code>1</code>=Increment).</p>
-</li>
-<li>
-<p><code>0x0003</code> - DMA destination address low</p>
-</li>
-<li>
-<p><code>0x0004</code> - DMA destination address high</p>
-</li>
-<li>
-<p><code>0x0005</code> - DMA length (a length greater than 0 will initiate a DMA transfer)</p>
-</li>
-<li>
-<p><strong><code>0x0038</code>: INPUT_P1.</strong> Controller 1 Input.</p>
-</li>
-<li>
-<p><strong><code>0x006A</code>: FRAMEINT_L.</strong> low 16 bits of address to jump to whenever a frame interrupt occurs.</p>
-</li>
-<li>
-<p><strong><code>0x006B</code>: FRAMEINT_H.</strong> high 15 bits of address to jump to whenever a frame interrupt occurs. The last bit enables frame interrupts.</p>
-</li>
+<li><code>0x0001</code> - DMA source address low</li>
+<li><code>0x0002</code> - DMA source address high. Bit 11 is the Source Increment Flag (<code>0</code>=Fixed, <code>1</code>=Increment).</li>
+<li><code>0x0003</code> - DMA destination address low</li>
+<li><code>0x0004</code> - DMA destination address high</li>
+<li><code>0x0005</code> - DMA length (a length greater than 0 will initiate a DMA transfer)</li>
+<li><strong><code>0x0038</code>: INPUT_P1.</strong> Controller 1 Input.</li>
+</ul>
+<p>bit 0 - d-pad left<br>
+bit 1 - d-pad right<br>
+bit 2 - d-pad up<br>
+bit 3 - d-pad down<br>
+bit 4 - A (button down)<br>
+bit 5 - B (button right)<br>
+bit 6 - X (button left)<br>
+bit 7 - Y (button up)<br>
+bit 8 - LB (left bumper)<br>
+bit 9 - RB (right bumper)<br>
+bit 10 - start<br>
+bit 11 - select</p>
+<ul>
+<li><strong><code>0x006A</code>: FRAMEINT_L.</strong> low 16 bits of address to jump to whenever a frame interrupt occurs.</li>
+<li><strong><code>0x006B</code>: FRAMEINT_H.</strong> high 15 bits of address to jump to whenever a frame interrupt occurs. The last bit enables frame interrupts.</li>
 </ul>
 <h3 id="gpu-control"><strong>7.2. GPU Control</strong></h3>
 <ul>
