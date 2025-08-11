@@ -203,7 +203,7 @@ std::vector<std::string> stringTokens[] =
     {"STR %R", "RegNumberArg1", ", %R", "RegNumberArg2"},       //11
     {"STRI R", "RegNumberArg1", ", %R", "RegNumberArg2"},       //12
     {"LDI %R", "RegNumberArg1", ", R", "RegNumberArg2"},       //13
-    {"STRI %R", "RegNumberArg1", ", %R", "RegNumberArg2"},       //14
+    {"STRI %R", "RegNumberArg2", ", %R", "RegNumberArg1"},       //14
     {"JMPORCALL", "SwapNoSwap", "sizeModeJ", " ", "jumpValue"},       //15
     {"CMP R", "RegNumberArg1", ", R", "RegNumberArg2"},       //16
     {"CMP %R", "RegNumberArg1", ", %R", "RegNumberArg2"},       //17
