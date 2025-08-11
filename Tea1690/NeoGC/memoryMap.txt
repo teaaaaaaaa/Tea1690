@@ -2,7 +2,7 @@ memory map for IO:
 
 0x0000 - CPU control registers
 
-bit 0 - DMA enable
+bit 0 - DMA post-increment toggle
 
 0x0001 - DMA source address low
 0x0002 - DMA source address high & 1-bit count

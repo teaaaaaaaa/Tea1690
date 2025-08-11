@@ -992,9 +992,9 @@ void audioInit()
 void scaleTest(unsigned short angle, signed short scale, signed short width, signed short height)
 {
     signed short XScale = int((cos(angle * 0.000191747598486) * scale) + (cos(angle * 0.000191747598486) * ((width * scale) >> 8)));
+    signed short YScale = int((cos(angle * 0.000191747598486) * scale) + (cos(angle * 0.000191747598486) * ((height * scale) >> 8)));
     signed short XShear = int((-sin(angle * 0.000191747598486) * scale) + (-sin(angle * 0.000191747598486) * ((width * scale) >> 8)));
     signed short YShear = int((sin(angle * 0.000191747598486) * scale) + (sin(angle * 0.000191747598486) * ((height * scale) >> 8)));
-    signed short YScale = int((cos(angle * 0.000191747598486) * scale) + (cos(angle * 0.000191747598486) * ((height * scale) >> 8)));
     OAM[4] = XScale;
     OAM[5] = YScale;
     OAM[6] = XShear;
@@ -1429,11 +1429,11 @@ int main(int argc, char** argv)
     // Initialize GLFW
     glfwInit();
 
-    // Create a windowed Â  
+    // Create a windowed   
     //mode window and its OpenGL context
         window = glfwCreateWindow(512, 480, "1690 emulator", NULL, NULL);
 
-    // Make the window's context Â  
+    // Make the window's context   
     //current
         glfwMakeContextCurrent(window);
 
@@ -1779,7 +1779,7 @@ int main(int argc, char** argv)
 
         glfwMakeContextCurrent(window);
 
-        // Render here Â 
+        // Render here  
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGB, GL_UNSIGNED_BYTE, secondaryFrameBuffer);
         // Set palette
         int width, height;
@@ -1903,7 +1903,7 @@ int main(int argc, char** argv)
                 vram_display_address = vram_display_address_copy;
                 //testValue++;
 
-                // Render here Â 
+                // Render here  
                 if (DISPMode == 2)
                     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, VWFrameBuffer);
                 else

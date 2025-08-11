@@ -525,7 +525,7 @@ void arithmeticType()
 {
     comparisonIndex = 0;
     codeMatch = false;
-    while (comparisonIndex < 7 && codeMatch == false)
+    while (comparisonIndex < 8 && codeMatch == false)
     {
         if (std::strncmp(arithmeticTokens[comparisonIndex].c_str(), reinterpret_cast<const char*>(compareBuffer), arithmeticTokens[comparisonIndex].size()) == 0)
             codeMatch = true;

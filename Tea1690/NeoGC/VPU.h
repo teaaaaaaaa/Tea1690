@@ -500,9 +500,9 @@ inline void VPULogic()
 					}
 					else
 					{
-							getTile = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 7)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767]) & 1023;
-							currentPaletteOffset = (((VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 7)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
-							tileFlags = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 7)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 13);
+							getTile = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767]) & 1023;
+							currentPaletteOffset = (((VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
+							tileFlags = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 13);
 					}
 					if (baseTile & tileBankFlag)
 						getTile += 1024;
