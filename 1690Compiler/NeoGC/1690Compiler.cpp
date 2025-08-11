@@ -768,7 +768,7 @@ void setSImmediate()
         tokenIndex = 0;
         instructionIndex++;
         outputInstruction = 0;
-        std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+        //std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
     }
 }
 
@@ -824,7 +824,7 @@ void setSImmediateNoIndirect()
         tokenIndex = 0;
         instructionIndex++;
         outputInstruction = 0;
-        std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+        //std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
     }
 }
 
@@ -879,7 +879,7 @@ void setSFImmediate()
         tokenIndex = 0;
         instructionIndex++;
         outputInstruction = 0;
-        std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+        //std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
     }
 }
 
@@ -919,7 +919,7 @@ void setSFImmediateNoIndirect()
         tokenIndex = 0;
         instructionIndex++;
         outputInstruction = 0;
-        std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
+        //std::cerr << "no valid prefix found (line " << lineNumber << ")" << std::endl;
     }
 }
 
