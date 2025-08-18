@@ -2,6 +2,10 @@
 //
 
 #include <iostream>
+#include <thread>   // For std::thread
+#include <mutex>    // For std::mutex and std::unique_lock
+#include <condition_variable> // For std::condition_variable
+#include <atomic>   // For std::atomic
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -103,6 +107,12 @@ char NumCharbuffer[4096];
 char NumString[32];
 char* buffer_ptr = NumCharbuffer;
 unsigned char buffer_src_ptr;
+
+//std::atomic<bool> work_ready(false);
+bool work_ready;
+std::condition_variable cv;
+std::condition_variable cv_worker;
+std::mutex mtx;
 
 const char* list1Strings[] =
 {
@@ -1410,6 +1420,102 @@ void (*metaTextDrawFunctions[])() =
     metaTextDraw3,
 };
 
+// This is the recursive helper that will fill the array
+template<int Index>
+struct JumpTableGenerator {
+    static void generate(RenderFunctionPtr* table, bool isAltTable) {
+        // --- The Magic Step ---
+        // Deconstruct the 'Index' back into the 7 boolean flags
+        if (isAltTable == false)
+        {
+            constexpr unsigned char F1 = (Index >> 0) & 3;
+            constexpr bool F3 = (Index >> 2) & 1;
+            constexpr bool F4 = (Index >> 3) & 1;
+            constexpr bool F5 = (Index >> 4) & 1;
+            constexpr bool F6 = (Index >> 5) & 1;
+            constexpr bool F7 = (Index >> 6) & 1;
+
+            // Assign the correct specialized function to this index in the table
+            table[Index] = &VPULogic<F1, F3, F4, F5, F6, F7>;
+            // Recursively call the generator for the previous index
+            JumpTableGenerator<Index - 1>::generate(table, false);
+        }
+        else
+        {
+            constexpr bool F1 = (Index >> 0) & 1;
+            constexpr bool F2 = (Index >> 1) & 1;
+            constexpr unsigned char F3 = (Index >> 2) & 3;
+            constexpr bool F5 = (Index >> 4) & 1;
+            constexpr bool F6 = (Index >> 5) & 1;
+            constexpr bool F7 = (Index >> 6) & 1;
+
+            // Assign the correct specialized function to this index in the table
+            pixelFunc_jumptable[Index] = &drawPixel<F1, F2, F3, F5, F6, F7>;
+            affinePixelFunc_jumptable[Index] = &drawAffinePixel<F1, F2, F3, F5, F6, F7>;
+            // Recursively call the generator for the previous index
+            JumpTableGenerator<Index - 1>::generate(table, true);
+        }
+    }
+};
+
+// --- The Base Case ---
+// This is the special version that stops the recursion when we hit -1
+template<>
+struct JumpTableGenerator<-1> {
+    static void generate(RenderFunctionPtr* table, bool isAltTable) {
+        // Do nothing. Stop.
+    }
+};
+
+void frameBuffer_translator_thread()
+{
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(mtx);
+        cv_worker.wait(lock, [] { return work_ready; });
+        signed char red = 0;
+        signed char green = 0;
+        signed char blue = 0;
+        unsigned int RGBBufferOffset = 0;
+        while (frameBufferOffset < 61440)
+        {
+            if ((currentFrame & 1) == 0)
+            {
+                red = (intermediateBuffer[frameBufferOffset] & 31);
+                green = ((intermediateBuffer[frameBufferOffset] >> 5) & 31);
+                blue = ((intermediateBuffer[frameBufferOffset] >> 10) & 31);
+                red += subGlobal;
+                green += subGlobal;
+                blue += subGlobal;
+                clampPalettes();
+                secondaryFrameBuffer[RGBBufferOffset] = paletteLookupTable[red + (green << 5) + (blue << 10)][0];
+                secondaryFrameBuffer[RGBBufferOffset + 1] = paletteLookupTable[red + (green << 5) + (blue << 10)][1];
+                secondaryFrameBuffer[RGBBufferOffset + 2] = paletteLookupTable[red + (green << 5) + (blue << 10)][2];
+            }
+            else
+            {
+                red = (intermediateBuffer2[frameBufferOffset] & 31);
+                green = ((intermediateBuffer2[frameBufferOffset] >> 5) & 31);
+                blue = ((intermediateBuffer2[frameBufferOffset] >> 10) & 31);
+                red += subGlobal;
+                green += subGlobal;
+                blue += subGlobal;
+                clampPalettes();
+                secondaryFrameBuffer[RGBBufferOffset] = paletteLookupTable[red + (green << 5) + (blue << 10)][0];
+                secondaryFrameBuffer[RGBBufferOffset + 1] = paletteLookupTable[red + (green << 5) + (blue << 10)][1];
+                secondaryFrameBuffer[RGBBufferOffset + 2] = paletteLookupTable[red + (green << 5) + (blue << 10)][2];
+            }
+            frameBufferOffset++;
+            RGBBufferOffset += 3;
+        }
+        work_ready = false;
+    }
+}
+
+void GPU_worker_thread()
+{
+}
+
 int main(int argc, char** argv)
 {
     HWND hwnd = GetConsoleWindow();
@@ -1426,8 +1532,13 @@ int main(int argc, char** argv)
         paletteLookupTable[i][1] = ((i >> 5) & 31) << 3;
         paletteLookupTable[i][2] = ((i >> 10) & 31) << 3;
     }
+    JumpTableGenerator<127>::generate(nullptr, true);
+    JumpTableGenerator<127>::generate(renderer_jumptable, false);
     // Initialize GLFW
     glfwInit();
+
+    std::thread frameBuffer_translator(frameBuffer_translator_thread);
+    frameBuffer_translator.detach();
 
     // Create a windowed   
     //mode window and its OpenGL context
@@ -1610,36 +1721,8 @@ int main(int argc, char** argv)
                     IO[0x06] = 0;
                     isComponentBusy[2] = 0;
                 }
-                while (frameBufferOffset < 61440)
-                {
-                    if ((currentFrame & 1) == 0)
-                    {
-                        red = (intermediateBuffer[frameBufferOffset] & 31);
-                        green = ((intermediateBuffer[frameBufferOffset] >> 5) & 31);
-                        blue = ((intermediateBuffer[frameBufferOffset] >> 10) & 31);
-                        red += subGlobal;
-                        green += subGlobal;
-                        blue += subGlobal;
-                        clampPalettes();
-                        secondaryFrameBuffer[frameBufferOffset][0] = paletteLookupTable[red + (green << 5) + (blue << 10)][0];
-                        secondaryFrameBuffer[frameBufferOffset][1] = paletteLookupTable[red + (green << 5) + (blue << 10)][1];
-                        secondaryFrameBuffer[frameBufferOffset][2] = paletteLookupTable[red + (green << 5) + (blue << 10)][2];
-                    }
-                    else
-                    {
-                        red = (intermediateBuffer2[frameBufferOffset] & 31);
-                        green = ((intermediateBuffer2[frameBufferOffset] >> 5) & 31);
-                        blue = ((intermediateBuffer2[frameBufferOffset] >> 10) & 31);
-                        red += subGlobal;
-                        green += subGlobal;
-                        blue += subGlobal;
-                        clampPalettes();
-                        secondaryFrameBuffer[frameBufferOffset][0] = paletteLookupTable[red + (green << 5) + (blue << 10)][0];
-                        secondaryFrameBuffer[frameBufferOffset][1] = paletteLookupTable[red + (green << 5) + (blue << 10)][1];
-                        secondaryFrameBuffer[frameBufferOffset][2] = paletteLookupTable[red + (green << 5) + (blue << 10)][2];
-                    }
-                    frameBufferOffset++;
-                }
+                work_ready = true;
+                cv_worker.notify_one();
                 //debug
                 while (currentCycle < 533334 && (stepCounter == -1 || stepCounter > 0))
                 {
@@ -1702,7 +1785,7 @@ int main(int argc, char** argv)
                         {
                             if ((IO[0x06] & 1))
                             {
-                                VPULogic();
+                                renderer_jumptable[jumpTableOffset]();
                                 IO[6] |= 4;
                                 isBusy[2] = 1;
                                 isBusy[3] = 1;
@@ -2033,10 +2116,10 @@ int main(int argc, char** argv)
             // If chronically missing, indicates emulator is too slow.
             // One strategy here is to advance next_frame_target_time by more than one frame
             // if we are VERY far behind (a "panic" frame skip for the timer).
-            if (time_to_wait < -TARGET_FRAME_DURATION_NS) { // If we are more than one full frame behind
+            //if (time_to_wait < -TARGET_FRAME_DURATION_NS) { // If we are more than one full frame behind
                 // std::cout << "Timer panic! Resetting next_frame_target_time." << std::endl;
-                next_frame_target_time = current_time + TARGET_FRAME_DURATION_NS - FRAME_DIFFERENCE; // Resync to now + 1 frame
-            }
+                //next_frame_target_time = current_time + TARGET_FRAME_DURATION_NS - FRAME_DIFFERENCE; // Resync to now + 1 frame
+            //}
         }
 
         // Update target for the *next* frame, regardless of whether we slept or overran.

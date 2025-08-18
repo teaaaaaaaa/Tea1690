@@ -81,6 +81,8 @@ unsigned char currentIntEntry = 0;
 unsigned short GPUIOOffset = 0x70;
 bool isIntDelayFetched;
 unsigned char intDelayCounter;
+unsigned short jumpTableOffset;
+unsigned short jumpTableOffset2;
 
 unsigned short* paletteFrontBuffer = paletteBuffer1;
 unsigned short* paletteBackBuffer = paletteBuffer2;
@@ -90,6 +92,14 @@ unsigned short paletteCopyIndex;
 unsigned char paletteLookupTable[65535][3];
 
 unsigned short intBufferPointers[8];
+
+// A type alias for our function pointers to keep things clean
+using RenderFunctionPtr = void(*)();
+
+// The jump table
+RenderFunctionPtr renderer_jumptable[128]; // For 7 flags (2^7 = 128)
+RenderFunctionPtr pixelFunc_jumptable[128]; // For 7 flags (2^7 = 128)
+RenderFunctionPtr affinePixelFunc_jumptable[128]; // For 7 flags (2^7 = 128)
 
 unsigned short TilemapANDValues[] =
 {
@@ -130,6 +140,12 @@ void tick1()
 	tileBaseOffset = 0;
 	basePixelX = (OAM[OAMAddress] & 511);
 	flags = (OAM[OAMAddress] >> 9);
+
+	if ((flags & mode) == 2)
+		tickCount = 8;
+	else
+		tickCount = 4;
+
 	OAMAddress ++;
 }
 
@@ -142,6 +158,10 @@ void tick2()
 	horizontalOrigin = (IO[0x3D + (((flags2 >> 2) & 7) * 6)]);
 	verticalOrigin = (IO[0x3E + (((flags2 >> 2) & 7) * 6)]);
 	currentPaletteOffset = ((flags2 >> 2) & 7) << 4;
+	if ((flags2 & transparency) == 0)
+		transparencyCompare = -1;
+	else
+		transparencyCompare = 0;
 	OAMAddress ++;
 }
 
@@ -158,6 +178,17 @@ void tick3()
 void tick4()
 {
 	baseTile = (OAM[OAMAddress]);
+
+	jumpTableOffset = (flags & 31) + (((flags2 & affineTilemapEnable) >> 1) << 5) + ((baseTile >> 15) << 6);
+	jumpTableOffset2 = ((flags & XFlipFlag) >> 2) + (((flags & YFlipFlag) >> 3) << 1) + (((flags & affineMode) >> 5) << 2) + (((flags2 & affineTilemapEnable) >> 1) << 4) + (((flags & dimensionFlag) >> 4) << 5) + (((flags2 & colorAverage) >> 5) << 6);
+	if (flags2 & affineDefaultFlag)
+	{
+		horizontalOrigin = affineWidth >> 1;
+		verticalOrigin = affineHeight >> 1;
+		affineHOffset = 0;
+		affineVOffset = 0;
+	}
+
 	OAMAddress += 5;
 }
 
@@ -224,15 +255,16 @@ inline unsigned short fetchVRAMNibble(unsigned short baseAddress, unsigned short
 	return VRAM[((((baseAddress + (offset >> 2)) >> ((offset & 3) << 2) & 15)) & 32767) + 32768];
 }
 
-inline void drawPixel()
+template<bool F1XFlip, bool F2YFlip, unsigned char F3AffineMode, bool F5AffineTMEnable, bool F6Dimension, bool F7ColorAverage>
+void drawPixel()
 {
 	//tilePixelXOffset = ((tileBaseOffset & 7));
 	//tilePixelYOffset = (((tileBaseOffset >> 3) & 7));
-	if ((flags & XFlipFlag) == 0)
+	if constexpr (F1XFlip == 0)
 		pixelX = (basePixelX + ((tileBaseOffset & 7)) + (tileX << 3)) & 511;
 	else
 		pixelX = ((tileWidth << 3) - (basePixelX + ((tileBaseOffset & 7)) + (tileX << 3)) - 1) & 511;
-	if ((flags & YFlipFlag) == 0)
+	if constexpr (F2YFlip == 0)
 		pixelY = (basePixelY + (((tileBaseOffset >> 3) & 7)) + (tileY << 3)) & 511;
 	else
 		pixelY = ((tileHeight << 3) - (basePixelY + (((tileBaseOffset >> 3) & 7)) + (tileY << 3)) - 1) & 511;
@@ -243,14 +275,14 @@ inline void drawPixel()
 		fetchPalette(getPixel + currentPaletteOffset);
 		if ((currentFrame & 1) == 0)
 		{
-			if (flags2 & colorAverage)
+			if constexpr (F7ColorAverage)
 				intermediateBuffer2[(pixelX + (pixelY << 8))] = colorAverageFunc(getPalette, intermediateBuffer2[(pixelX + (pixelY << 8))]);
 			else
 				intermediateBuffer2[(pixelX + (pixelY << 8))] = getPalette;
 		}
 		else
 		{
-			if (flags2 & colorAverage)
+			if constexpr (F7ColorAverage)
 				intermediateBuffer[(pixelX + (pixelY << 8))] = colorAverageFunc(getPalette, intermediateBuffer[(pixelX + (pixelY << 8))]);
 			else
 				intermediateBuffer[(pixelX + (pixelY << 8))] = getPalette;
@@ -279,36 +311,30 @@ inline int fetchVRAMByteWide(unsigned int X, unsigned int Y)
 
 inline void calculateHV()
 {
-	if (flags2 & affineDefaultFlag)
-	{
-		horizontalOrigin = affineWidth >> 1;
-		verticalOrigin = affineHeight >> 1;
-		affineHOffset = 0;
-		affineVOffset = 0;
-	}
 	getHorizontalOffsetUnsigned = affineHOffset + (horizontalShear * (heightCounter - verticalOrigin)) + horizontalScaleCounter - (horizontalScale * horizontalOrigin) + (horizontalOrigin << 8);
 	getVerticalOffsetUnsigned = affineVOffset + (verticalScaleCounter + (verticalShear * (widthCounter - horizontalOrigin)) - (verticalScale * verticalOrigin)) + (verticalOrigin << 8);
 }
 
-inline void drawAffinePixel()
+template<bool F1XFlip, bool F2YFlip, unsigned char F3AffineMode, bool F5AffineTMEnable, bool F6Dimension, bool F7ColorAverage>
+void drawAffinePixel()
 {
 		pixelX = (basePixelX + widthCounter) & 511;
 		pixelY = (basePixelY + heightCounter) & 511;
 		calculateHV();
-		if (flags2 & affineTilemapEnable)
+		if constexpr (F5AffineTMEnable)
 		{
 			getPixel = ((VRAM[((getTile << 4) + ((getHorizontalOffsetUnsigned >> 10) & 1) + (((getVerticalOffsetUnsigned >> 8) << 1) & 15) & 32767) + 32768]) >> (((getHorizontalOffsetUnsigned >> 8) & 3) << 2)) & 15;
 		}
 		else
 		{
-			if (flags & dimensionFlag)
+			if constexpr (F6Dimension)
 			{
 				getHorizontalOffsetUnsigned &= (65535 << 1);
-				if (((flags & affineMode) >> 5) == 0 || ((flags & affineMode) >> 5) == 1)
+				if constexpr (F3AffineMode == 0 || F3AffineMode == 1)
 				{
 					getPixel = fetchVRAMByteWide(getHorizontalOffsetUnsigned + ((baseTile & 63) << 10), getVerticalOffsetUnsigned + ((baseTile >> 6) << 8));
 				}
-				if (((flags & affineMode) >> 5) == 2)
+				if constexpr (F3AffineMode == 2)
 				{
 					getPixel = fetchVRAMByteWide((getHorizontalOffsetUnsigned % ((affineWidth << 8) + 1)) + ((baseTile & 63) << 10), (getVerticalOffsetUnsigned % ((affineHeight << 8) + 1)) + ((baseTile >> 6) << 8));
 				}
@@ -316,18 +342,18 @@ inline void drawAffinePixel()
 			else
 			{
 				getHorizontalOffsetUnsigned &= 65535;
-				if (((flags & affineMode) >> 5) == 0 || ((flags & affineMode) >> 5) == 1)
+				if constexpr (F3AffineMode == 0 || F3AffineMode == 1)
 				{
 					getPixel = fetchVRAMByte(getHorizontalOffsetUnsigned + ((baseTile & 63) << 10), getVerticalOffsetUnsigned + ((baseTile >> 6) << 8));
 				}
-				if (((flags & affineMode) >> 5) == 2)
+				if constexpr (F3AffineMode == 2)
 				{
 					getPixel = fetchVRAMByte((getHorizontalOffsetUnsigned % ((affineWidth << 8) + 1)) + ((baseTile & 63) << 10), (getVerticalOffsetUnsigned % ((affineHeight << 8) + 1)) + ((baseTile >> 6) << 8));
 				}
 			}
 		}
 	//getPixel = rand();
-	if (((flags & affineMode) >> 5) == 1)
+	if constexpr (F3AffineMode == 1)
 	{
 		if ((getHorizontalOffsetUnsigned >> 8) >= affineWidth || (getVerticalOffsetUnsigned >> 8) >= affineHeight)
 			getPixel = 0;
@@ -337,14 +363,14 @@ inline void drawAffinePixel()
 		fetchPalette(getPixel + currentPaletteOffset);
 		if ((currentFrame & 1) == 0)
 		{
-			if (flags2 & colorAverage)
+			if constexpr (F7ColorAverage)
 				intermediateBuffer2[(pixelX + (pixelY << 8))] = colorAverageFunc(getPalette,intermediateBuffer2[(pixelX + (pixelY << 8))]);
 			else
 				intermediateBuffer2[(pixelX + (pixelY << 8))] = getPalette;
 		}
 		else
 		{
-			if (flags2 & colorAverage)
+			if constexpr (F7ColorAverage)
 				intermediateBuffer[(pixelX + (pixelY << 8))] = colorAverageFunc(getPalette, intermediateBuffer[(pixelX + (pixelY << 8))]);
 			else
 				intermediateBuffer[(pixelX + (pixelY << 8))] = getPalette;
@@ -373,47 +399,40 @@ tick7,
 tick8,
 };
 
-inline void VPULogic()
+template<unsigned char F1Mode, bool F3XFlip, bool F4YFlip, bool F5Dimension, bool F6AffineTMEnable, bool F7TileBank>
+void VPULogic()
 {
-	if ((flags & mode) == 2)
-		tickCount = 8;
-	else
-		tickCount = 4;
-	if ((flags2 & transparency) == 0)
-		transparencyCompare = -1;
-	else
-		transparencyCompare = 0;
 		if (VPUtick < tickCount)
 		{
 			VPUtickFunctions[VPUtick]();
 		}
 		if (VPUtick >= 4)
 		{
-			if ((flags & mode) == 0)
+			if constexpr (F1Mode == 0)
 			{
 				if (VPUtick > 3 && tileY >= tileHeight)
 				{
 					VPUtick = 0;
 					return;
 				}
-				if ((flags & dimensionFlag) == 0)
+				if constexpr (F5Dimension == 0)
 					VRAMAddress = (((baseTile << 4) + (tileBaseOffset >> 2)) & 16383) + 32768;
 				else
 					VRAMAddress = ((((baseTile << 4) + ((tileX << 4) + (tileY << 9))) + (tileBaseOffset >> 2)) & 16383) + 32768;
-				if (baseTile & tileBankFlag)
+				if constexpr (F7TileBank)
 					VRAMAddress += 16384;
-				drawPixel();
+				pixelFunc_jumptable[jumpTableOffset2]();
 			}
-			if ((flags & mode) == 1)
+			if constexpr (F1Mode == 1)
 			{
 				if (VPUtick > 3)
 				{
-					if ((flags & dimensionFlag) == 0)
+					if constexpr (F5Dimension == 0)
 					{
 							getTile = (VRAM[(((baseTile + (tileBaseOffset >> 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767]) & 1023;
 							currentPaletteOffset = (((VRAM[(((baseTile + (tileBaseOffset >> 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
 							tileFlags = (VRAM[(((baseTile + (tileBaseOffset >> 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 13);
-						if (baseTile & tileBankFlag)
+						if constexpr (F7TileBank)
 							getTile += 1024;
 					}
 					else
@@ -421,7 +440,7 @@ inline void VPULogic()
 							getTile = (VRAM[(((((baseTile + tileX) & 63) + ((tileY + (baseTile >> 6)) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767]) & 1023;
 							currentPaletteOffset = (((VRAM[(((((baseTile + tileX) & 63) + ((tileY + (baseTile >> 6)) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
 							tileFlags = (VRAM[(((((baseTile + tileX) & 63) + ((tileY + (baseTile >> 6)) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 13);
-						if (baseTile & tileBankFlag)
+						if constexpr (F7TileBank)
 							getTile += 1024;
 					}
 					bitOrFlag = (tileFlags & tileXFlipFlag);
@@ -439,11 +458,11 @@ inline void VPULogic()
 					else
 						perTileYOffset = ((7 - (tileBaseOffset >> 3)) & 7);
 					VRAMAddress = (((getTile << 4) + ((perTileXOffset >> 2) + (perTileYOffset << 1))) & 32767) + 32768;
-					drawPixel();
+					pixelFunc_jumptable[jumpTableOffset2]();
 				}
 			}
 		}
-		if ((flags & mode) == 2)
+		if constexpr (F1Mode == 2)
 		{
 			if (VPUtick >= 8)
 			{
@@ -489,10 +508,10 @@ inline void VPULogic()
 						}
 					}
 				}
-				if (flags2 & affineTilemapEnable)
+				if constexpr (F6AffineTMEnable)
 				{
 					calculateHV();
-					if (flags & dimensionFlag)
+					if constexpr (F5Dimension)
 					{
 							getTile = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 127) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 7)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767]) & 1023;
 							currentPaletteOffset = (((VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 127) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 7)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
@@ -504,13 +523,13 @@ inline void VPULogic()
 							currentPaletteOffset = (((VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 10) & 7) << 4);
 							tileFlags = (VRAM[(((((baseTile + (getHorizontalOffsetUnsigned >> 11)) & 63) + ((baseTile >> 6) << 6) + ((getVerticalOffsetUnsigned >> 11) << 6)) & TilemapANDValues[((flags & affineMode) >> 5) & 3]) + ((baseTile >> TilemapShiftValues[((flags & affineMode) >> 5) & 3]) << TilemapShiftValues[((flags & affineMode) >> 5) & 3])) & 32767] >> 13);
 					}
-					if (baseTile & tileBankFlag)
+					if constexpr (F7TileBank)
 						getTile += 1024;
-					drawAffinePixel();
+					affinePixelFunc_jumptable[jumpTableOffset2]();
 				}
 				else
 				{
-					drawAffinePixel();
+					affinePixelFunc_jumptable[jumpTableOffset2]();
 				}
 				if (heightCounter >= affineHeight)
 				{
@@ -523,9 +542,11 @@ inline void VPULogic()
 				}
 			}
 		}
-		if ((flags & mode) == 3)
+		if constexpr (F1Mode == 3)
 		{
 			VPUtick = 0;
+			jumpTableOffset = 0;
+			jumpTableOffset2 = 0;
 		}
 	if (OAMAddress > 2048)
 	{

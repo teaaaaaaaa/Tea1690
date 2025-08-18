@@ -153,7 +153,7 @@ unsigned short intermediateBuffer[256 * 240];
 unsigned short intermediateBuffer2[256 * 240];
 
 //final stage of rendered output
-unsigned char secondaryFrameBuffer[256 * 240][3];
+unsigned char secondaryFrameBuffer[256 * 240 * 3];
 
 unsigned char VWFrameBuffer[512 * 256][3];
 
